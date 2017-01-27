@@ -1,5 +1,5 @@
-from network.proxy import startProxyServer
-from network.proxychains import launchDofus
+from com.network.proxy import startProxyServer
+from com.network.proxychains import launchDofus
 
 # to interrupt : httpd.shutdown()
 httpd = startProxyServer()
