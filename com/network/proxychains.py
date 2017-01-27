@@ -6,8 +6,7 @@ import subprocess
 
 confpath = os.path.join(os.path.dirname(__file__), 'config.json')
 command = ['DYLD_INSERT_LIBRARIES=/System/Library/Frameworks/OpenGL.framework/Resources/GLEngine.bundle/GLEngine',
-           'proxychains4',
-           '-f', confpath,
+           'proxychains4', '-f', confpath,
            '/Applications/Dofus.app/Contents/Data/Dofus.app/Contents/MacOS/Dofus']
 
 
