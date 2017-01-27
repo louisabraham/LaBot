@@ -4,12 +4,12 @@
 
 
 ### Fonctionnalités :
-    - Redirection de la connexion de manière transparente, voir simplement le fichier exécutable `core/network/proxychains.py`
-    - serveur proxy http (`core/network/proxy.py`)
-    - Différentes interfaces de callback (`core/network/bridge`)
-    - Démarrage d'un bot, avec possibilité de lancer les callbacks en asynchrone
-    - Décodage sommaire des paquets (`core/data/msg.py`)
-    - Reader / Writer Python pouvant être utilisés avec un traducteur
+- Redirection de la connexion de manière transparente, voir simplement le fichier exécutable `core/network/proxychains.py`
+- serveur proxy http (`core/network/proxy.py`)
+- Différentes interfaces de callback (`core/network/bridge`)
+- Démarrage d'un bot, avec possibilité de lancer les callbacks en asynchrone
+- Décodage sommaire des paquets (`core/data/msg.py`)
+- Reader / Writer Python pouvant être utilisés avec un traducteur
 
 
 ### Plates-formes :
