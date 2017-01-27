@@ -30,8 +30,8 @@ class DummyBridgeHandler(BridgeHandler):
         other[origin].sendall(data)
 
 
-class PacketBridgeHandler(BridgeHandler):
-    """Advanced policy to work with the parsed packets.
+class MsgBridgeHandler(BridgeHandler):
+    """Advanced policy to work with the parsed messages
     You just have to subclass and fill the handleMessage method."""
 
     def __init__(self, *args, **kwargs):
