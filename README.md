@@ -3,7 +3,7 @@
 ## Bases d'un bot Dofus MITM
 
 
-* Fonctionnalités :
+### Fonctionnalités :
     - Redirection de la connexion de manière transparente, voir simplement le fichier exécutable `core/network/proxychains.py`
     - serveur proxy http (`core/network/proxy.py`)
     - Différentes interfaces de callback (`core/network/bridge`)
@@ -12,11 +12,11 @@
     - Reader / Writer Python pouvant être utilisés avec un traducteur
 
 
-* Plates-formes :
+### Plates-formes :
 Ce code est compatible avec tout système où la commande [proxychains4](https://github.com/rofl0r/proxychains-ng) est installée (OS X, Linux).
 
 
-* Mode d'emploi :
+### Mode d'emploi :
 
 Remplacer la fonction main dans core/main.py par la fonction main de votre bot.
 Elle prend en entrée `coJeu` et `coServ` les deux sockets vers le client et le serveur.
