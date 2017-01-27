@@ -30,6 +30,9 @@ class ProxyRequestHandler(BaseHTTPRequestHandler):
         main(self.connection, s)
         # It MUST run in sync mode (not threaded)
         # The bot will run in sync mode and will have a Bridge in async
+        # You can use the condition
+        # if address[0] not in connection_servers
+        # to start your bot only after the connexion
 
         # VERY IMPORTANT
         self.close_connection = True
