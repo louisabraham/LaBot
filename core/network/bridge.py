@@ -26,7 +26,7 @@ class BridgeHandler():
         self.other = {coJeu: coSer, coSer: coJeu}
 
     def handle(self, data, origin):
-        raise NotImplemented
+        raise NotImplementedError
 
 
 class DummyBridgeHandler(BridgeHandler):
@@ -63,7 +63,7 @@ class MsgBridgeHandler(BridgeHandler):
                 
 
     def handleMessage(self, msg, origin):
-        raise NotImplemented
+        raise NotImplementedError
 
 
 class PrintingMsgBridgeHandler(MsgBridgeHandler):
