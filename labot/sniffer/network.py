@@ -55,7 +55,6 @@ refresh: check stop_event.set() every refresh seconds
                     continue
                 if store:
                     lst.append(p)
-                c += 1
                 if prn:
                     r = prn(p)
                     if r is not None:
