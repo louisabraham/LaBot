@@ -1,7 +1,8 @@
 -   Provide setup.py
--   Option for filter / filter using IP
+-   Option for filter / filter using @nk@m@ IP
 -   Improve SnifferUI for toggling messages
--   overflow-y:
-    <https://cdn.discordapp.com/attachments/322665210093764608/433098403472474113/Screen_Shot_2018-04-10_at_10.57.45_AM.png>
+-   overflow-y for tbody
 -   Use [webruntime](https://github.com/flexxui/webruntime) to launch in
     new app
+-   Write Sphinx docs and make github page
+-   save history to log file
