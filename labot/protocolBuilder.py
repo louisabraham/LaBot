@@ -1,19 +1,28 @@
 from pathlib import Path
 import re
-from pprint import pprint
 import pickle
 
+from pprint import pprint
 
-class_pattern = r"\s*public class (?P<name>\w+) (?:extends (?P<parent>\w+) )?implements (?P<interface>\w+)\n"
-id_pattern = r"\s*public static const protocolId:uint = (?P<id>\d+);\n"
-public_var_pattern = r"\s*public var (?P<name>\w+):(?P<type>\S*)( = (?P<init>.*))?;\n"
-vector_type_pattern = r"Vector\.<(?P<type>\w+)>"
+class_pattern =\
+    r"\s*public class (?P<name>\w+) (?:extends (?P<parent>\w+) )?implements (?P<interface>\w+)\n"
+id_pattern =\
+    r"\s*public static const protocolId:uint = (?P<id>\d+);\n"
+public_var_pattern =\
+    r"\s*public var (?P<name>\w+):(?P<type>\S*)( = (?P<init>.*))?;\n"
+vector_type_pattern =\
+    r"Vector\.<(?P<type>\w+)>"
 
-attr_assign_pattern_of_name = r"\s*this\.%s = (?:\w*)\.read(?P<type>\w*)\(\);\n"
-vector_attr_write_pattern_of_name = r"\s*(?:\w*)\.write(?P<type>\w*)\(this\.%s\[(?:\w+)\]\);\n"
-vector_len_write_pattern_of_name = r"\s*(?:\w*)\.write(?P<type>\w*)\(this\.%s\.length\);\n"
-vector_const_len_pattern_of_name_and_type = r"\s*this\.%s = new Vector\.<%s>\((?P<size>\d+),true\);\n"
-dynamic_type_pattern_of_type = r"\s*(?:this\.)?\w+ = ProtocolTypeManager\.getInstance\(%s,\w*\);\n"
+attr_assign_pattern_of_name =\
+    r"\s*this\.%s = (?:\w*)\.read(?P<type>\w*)\(\);\n"
+vector_attr_write_pattern_of_name =\
+    r"\s*(?:\w*)\.write(?P<type>\w*)\(this\.%s\[(?:\w+)\]\);\n"
+vector_len_write_pattern_of_name =\
+    r"\s*(?:\w*)\.write(?P<type>\w*)\(this\.%s\.length\);\n"
+vector_const_len_pattern_of_name_and_type =\
+    r"\s*this\.%s = new Vector\.<%s>\((?P<size>\d+),true\);\n"
+dynamic_type_pattern_of_type =\
+    r"\s*(?:this\.)?\w+ = ProtocolTypeManager\.getInstance\(%s,\w*\);\n"
 
 
 def load_from_path(path):
