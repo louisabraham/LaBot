@@ -54,7 +54,9 @@ class Data:
         self.data = decompress(self.data)
 
     def readBoolean(self):
-        return bool(self.read(1))
+        ans = self.read(1)
+        assert ans[0] in [0, 1]
+        return bool(ans[0])
 
     def writeBoolean(self, b):
         if b:
@@ -129,20 +131,26 @@ class Data:
     def readVarInt(self):
         ans = 0
         for i in range(0, 32, 7):
-            b = self.readByte()
+            b = self.readUnsignedByte()
             ans += (b & 0b01111111) << i
             if not b & 0b10000000:
                 return ans
         raise Exception("Too much data")
 
-    def writeVarInt(self):
-        raise NotImplementedError
+    def writeVarInt(self, i):
+        assert i.bit_length() <= 32
+        while i:
+            b = i & 0b01111111
+            i >>= 7
+            if i:
+                b |= 0b10000000
+            self.writeUnsignedByte(b)
 
     def readVarUhInt(self):
         return self.readVarInt()
 
-    def writeVarUhInt(self):
-        raise self.writeVarInt()
+    def writeVarUhInt(self, i):
+        self.writeVarInt(i)
 
     def readVarLong(self):
         ans = 0
@@ -153,14 +161,20 @@ class Data:
                 return ans
         raise Exception("Too much data")
 
-    def writeVarLong(self):
-        raise NotImplementedError
+    def writeVarLong(self, i):
+        assert i.bit_length() <= 64
+        while i:
+            b = i & 0b01111111
+            i >>= 7
+            if i:
+                b |= 0b10000000
+            self.writeUnsignedByte(b)
 
     def readVarUhLong(self):
         return self.readVarLong()
 
-    def writeVarUhLong(self):
-        raise self.writeVarLong()
+    def writeVarUhLong(self, i):
+        self.writeVarLong(i)
 
     def readVarShort(self):
         ans = 0
@@ -171,14 +185,20 @@ class Data:
                 return ans
         raise Exception("Too much data")
 
-    def writeVarShort(self):
-        raise NotImplementedError
+    def writeVarShort(self, i):
+        assert i.bit_length() <= 16
+        while i:
+            b = i & 0b01111111
+            i >>= 7
+            if i:
+                b |= 0b10000000
+            self.writeUnsignedByte(b)
 
     def readVarUhShort(self):
         return self.readVarShort()
 
-    def writeVarUhShort(self):
-        raise self.writeVarShort()
+    def writeVarUhShort(self, i):
+        self.writeVarShort(i)
 
 
 class Buffer(Data):
