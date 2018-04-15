@@ -60,3 +60,10 @@ class Msg:
         if not hasattr(self, 'parsed'):
             self.parsed = protocol.read(self.msgType, self.data)
         return self.parsed
+
+    @staticmethod
+    def from_json(json, count=None):
+        type = json['__type__']
+        id = protocol.types[type]['protocolId']
+        data = protocol.write(type, json)
+        return Msg(id, data, count)
