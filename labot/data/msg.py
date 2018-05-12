@@ -1,5 +1,5 @@
-from .binrw import Data
-from .. import protocol
+from data.binrw import Data
+import protocol
 
 
 class Msg:
@@ -30,7 +30,12 @@ class Msg:
             buf.pos = 0
             return None
         else:
-            buf.end()
+            try:
+                buf.end()
+                # This wil fail if the buffer comes from 
+                # a decompressed NetworkDataContainerMessage
+            except TypeError:
+                pass
             return Msg(id, data, count)
 
     def lenlenData(self):
