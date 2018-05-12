@@ -17,14 +17,14 @@ try:
     from scapy3k.data import ETH_P_ALL, MTU
 except ModuleNotFoundError:
     from scapy.all import plist, conf
-    from scapy.all import Raw, IP
+    from scapy.all import Raw, IP, PcapReader
     from scapy.data import ETH_P_ALL, MTU
 
-from ..data import Buffer, Msg
+from data import Buffer, Msg
 
 
 def sniff(store=False, prn=None, lfilter=None,
-          stop_event=None, refresh=.1, *args, **kwargs):
+          stop_event=None, refresh=.1, offline=None, *args, **kwargs):
     """Sniff packets
 sniff([count=0,] [prn=None,] [store=1,] [offline=None,] [lfilter=None,] + L2ListenSocket args)
   Modified version of scapy.all.sniff
@@ -39,7 +39,11 @@ lfilter: python function applied to each packet to determine
 stop_event: Event that stops the function when set
 refresh: check stop_event.set() every refresh seconds
     """
-    s = conf.L2listen(type=ETH_P_ALL, *args, **kwargs)
+    if offline is None:
+        L2socket = conf.L2listen
+        s = L2socket(type=ETH_P_ALL, *args, **kwargs)
+    else:
+        s = PcapReader(offline)
     remain = None
     lst = []
     try:
@@ -102,17 +106,25 @@ def on_receive(pa, action):
         msg = Msg.fromRaw(buf, direction)
 
 
-def launch_in_thread(action):
+def launch_in_thread(action, capture_file=None):
     """Sniff in a new thread
     When a packet is received, Returns a stop function
     """
 
     def _sniff(stop_event):
-        sniff(filter='tcp port 5555',
-              lfilter=lambda p: p.haslayer(Raw),
-              stop_event=stop_event,
-              prn=lambda p: on_receive(p, action)
-              )
+        if capture_file:
+            sniff(filter='tcp port 5555',
+                  lfilter=lambda p: p.haslayer(Raw),
+                  stop_event=stop_event,
+                  prn=lambda p: on_receive(p, action),
+                  offline=capture_file
+                  )
+        else:
+            sniff(filter='tcp port 5555',
+                  lfilter=lambda p: p.haslayer(Raw),
+                  stop_event=stop_event,
+                  prn=lambda p: on_receive(p, action),
+                  )
         print('sniffing stopped')
 
     e = threading.Event()
