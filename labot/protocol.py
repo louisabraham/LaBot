@@ -1,7 +1,8 @@
 from functools import reduce
 
-from .protocolBuilder import types, msg_from_id, types_from_id, primitives
-from .data import Data
+from protocolBuilder import types, msg_from_id, types_from_id, primitives
+from data import Data, Buffer
+from zlib import decompress
 
 primitives = {
     name: (
@@ -54,6 +55,13 @@ def read(type, data):
             ans[var['name']] = readVec(var, data)
         else:
             ans[var['name']] = read(var['type'], data)
+    if type['name'] == "NetworkDataContainerMessage":
+        from data import Msg  # Ugly but otherwise we get a circular import
+        innerdata = Buffer(ans['content'])
+        innerdata.uncompress()
+        innerMsg = Msg.fromRaw(innerdata, False)
+        ans['innerpacket'] = read(innerMsg.msgType, innerMsg.data)
+        print("hello")
     return ans
 
 
