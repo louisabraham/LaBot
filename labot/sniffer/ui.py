@@ -14,8 +14,9 @@ from wdom.themes.bootstrap3 import *
 
 
 class SnifferUI(Div):
-    def __init__(self, startfun, *args, **kwargs):
+    def __init__(self, startfun, capture_file=None, *args, **kwargs):
         self.startfun = startfun
+        self.capture_file = capture_file
         self.stopfun = None
         super().__init__(*args, **kwargs)
 
@@ -36,7 +37,8 @@ class SnifferUI(Div):
     def start(self, event):
         # TODO: display message
         if self.stopfun is None:
-            self.stopfun = self.startfun(self.msgtable.appendMsg)
+            self.stopfun = self.startfun(
+                self.msgtable.appendMsg, self.capture_file)
             self.info.textContent = 'Sniffer started'
         else:
             self.info.textContent = 'Sniffer already started'
@@ -98,9 +100,9 @@ document.register_theme(bootstrap3)
 document.add_jsfile('https://unpkg.com/sticky-table-headers')
 
 
-def init(start):
+def init(start, capture_file=None):
     global ui
-    ui = SnifferUI(start)
+    ui = SnifferUI(start, capture_file=capture_file)
     set_app(ui)
 
 
