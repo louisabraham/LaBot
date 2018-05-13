@@ -1,11 +1,11 @@
-from sniffer.network import launch_in_thread
-import sniffer.ui
+from .network import launch_in_thread
+from . import ui
 import argparse
 
 
 def main(capture_file=None):
-    sniffer.ui.init(launch_in_thread, capture_file)
-    sniffer.ui.async_start()
+    ui.init(launch_in_thread, capture_file)
+    ui.async_start()
 
 
 if __name__ == "__main__":

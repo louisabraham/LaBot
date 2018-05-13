@@ -6,6 +6,7 @@ parser = argparse.ArgumentParser(
 parser.add_argument('--capture', '-c', metavar='PATH', type=str,
                     help='Path to capture file')
 args = parser.parse_args()
+
 if args.capture:
     sniffer.main.main(args.capture)
 else:

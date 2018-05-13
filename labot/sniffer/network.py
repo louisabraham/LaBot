@@ -20,7 +20,7 @@ except ModuleNotFoundError:
     from scapy.all import Raw, IP, PcapReader
     from scapy.data import ETH_P_ALL, MTU
 
-from data import Buffer, Msg
+from ..data import Buffer, Msg
 
 
 def sniff(store=False, prn=None, lfilter=None,
