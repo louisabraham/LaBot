@@ -1,6 +1,6 @@
 from .binrw import Data
-from .. import protocol
 from ..logs import logger
+from .. import protocol
 
 class Msg:
 
