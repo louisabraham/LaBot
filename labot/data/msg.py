@@ -1,5 +1,5 @@
-from data.binrw import Data
-import protocol
+from .binrw import Data
+from  .. import protocol
 
 
 class Msg:

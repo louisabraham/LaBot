@@ -1,7 +1,7 @@
 from functools import reduce
 
-from protocolBuilder import types, msg_from_id, types_from_id, primitives
-from data import Data, Buffer
+from .protocolBuilder import types, msg_from_id, types_from_id, primitives
+from .data import Data, Buffer
 from zlib import decompress
 
 primitives = {

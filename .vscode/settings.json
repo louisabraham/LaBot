@@ -1,0 +1,8 @@
+{
+    "python.pythonPath": "/usr/local/opt/python/bin/python3.6",
+    "python.linting.pylintEnabled": true,
+    "python.linting.mypyEnabled": true,
+    "python.linting.enabled": true,
+    "python.linting.flake8Enabled": false,
+    "python.linting.pep8Enabled": false
+}

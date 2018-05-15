@@ -2,6 +2,8 @@ from .network import launch_in_thread
 from . import ui
 import argparse
 
+from ..logs import logger
+
 
 def main(capture_file=None):
     ui.init(launch_in_thread, capture_file)
