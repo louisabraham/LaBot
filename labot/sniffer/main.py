@@ -7,11 +7,12 @@ from ..logs import logger
 
 def main(capture_file=None):
     ui.init(launch_in_thread, capture_file)
-    ui.async_start()
+    ui.start()
 
 
 if __name__ == "__main__":
 
+    logger.debug("Starting sniffer as __main__")
     parser = argparse.ArgumentParser(
         description='Start the sniffer either from a file or from live capture.')
     parser.add_argument('--capture', '-c', metavar='PATH', type=str,

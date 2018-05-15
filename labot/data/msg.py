@@ -1,5 +1,11 @@
+<<<<<<< HEAD
 from .binrw import Data
 from .. import protocol
+=======
+
+from .binrw import Data
+from  .. import protocol
+>>>>>>> Improved logger and added log messages
 from ..logs import logger
 
 class Msg:
