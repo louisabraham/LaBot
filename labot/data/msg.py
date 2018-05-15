@@ -1,5 +1,5 @@
 from .binrw import Data
-from .. import protocol
+from  .. import protocol
 from ..logs import logger
 
 class Msg:
