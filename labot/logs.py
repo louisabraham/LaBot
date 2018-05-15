@@ -43,7 +43,7 @@ class ColoredFormatter(logging.Formatter):
         return logging.Formatter.format(self, record)
 
 
-FORMAT = '%(asctime)s.%(msecs)03d %(threadName)s: function "%(funcName)s" of module "%(module)s"  \n %(levelname)s: %(message)s'
+FORMAT = '%(asctime)s.%(msecs)02d %(levelname)s: %(threadName)s - %(module)s.%(funcName)s(): %(message)s \n'
 COLOR_FORMAT = formatter_message(FORMAT, True)
 
 
