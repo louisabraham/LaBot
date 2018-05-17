@@ -5,3 +5,4 @@ sources/
 protocol.pk
 junk/
 .mypy_cache
+.vscode

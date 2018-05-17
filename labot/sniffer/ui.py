@@ -131,10 +131,7 @@ def async_start():
     loop = asyncio.get_event_loop()
     t = threading.Thread(target=loop_in_thread, args=(loop,))
     t.start()
-<<<<<<< HEAD
-=======
     logger.debug("Started sniffer in thread: {}".format(t))
->>>>>>> Improved logger and added log messages
 
 
 if __name__ == '__main__':
