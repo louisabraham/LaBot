@@ -51,7 +51,7 @@ class Data:
         return self.data[pos:pos + l]
 
     def uncompress(self):
-        self.data = decompress(self.data)
+        self.data = bytearray(decompress(self.data))
 
     def readBoolean(self):
         ans = self.read(1)
