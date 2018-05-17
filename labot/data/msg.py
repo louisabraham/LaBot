@@ -1,5 +1,5 @@
 from .binrw import Data
-from  .. import protocol
+from .. import protocol
 from ..logs import logger
 
 class Msg:
@@ -34,12 +34,7 @@ class Msg:
             logger.debug("Could not parse message: Not complete")
             return None
         else:
-            try:
-                buf.end()
-                # This wil fail if the buffer comes from 
-                # a decompressed NetworkDataContainerMessage
-            except TypeError:
-                pass
+            buf.end()
             logger.debug("Parsed message with ID {}".format(id))
             return Msg(id, data, count)
 

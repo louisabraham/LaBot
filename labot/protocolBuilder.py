@@ -6,8 +6,7 @@ from pprint import pprint
 from typing import Union
 
 class_pattern =\
-    r"\s*public class (?P<name>\w+) (?:extends (?P<parent>\w+) )?implements (?P<interface>\w+(?:, \w+)?)\n"
-
+    r"\s*public class (?P<name>\w+) (?:extends (?P<parent>\w+) )?implements (?P<interface>\w+)\n"
 id_pattern =\
     r"\s*public static const protocolId:uint = (?P<id>\d+);\n"
 public_var_pattern =\
@@ -141,7 +140,6 @@ def parse(t):
 
 def build():
     for t in types.values():
-        print("Parsing: " + t['name'])
         parse(t)
 
 
