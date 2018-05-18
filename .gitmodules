@@ -1,0 +1,3 @@
+[submodule "PyDofus"]
+	path = PyDofus
+	url = https://github.com/balciseri/PyDofus
