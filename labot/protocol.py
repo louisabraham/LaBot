@@ -55,13 +55,6 @@ def read(type, data):
             ans[var['name']] = readVec(var, data)
         else:
             ans[var['name']] = read(var['type'], data)
-    if type['name'] == "NetworkDataContainerMessage":
-        from data import Msg  # Ugly but otherwise we get a circular import
-        innerdata = Buffer(ans['content'])
-        innerdata.uncompress()
-        innerMsg = Msg.fromRaw(innerdata, False)
-        ans['innerpacket'] = read(innerMsg.msgType, innerMsg.data)
-        print("hello")
     return ans
 
 

@@ -3,6 +3,8 @@
 from .proxy import startProxyServer
 from .proxychains import launchDofus
 
+logger.setLevel('INFO')
+
 # to interrupt : httpd.shutdown()
 httpd = startProxyServer()
 
@@ -10,3 +12,4 @@ httpd = startProxyServer()
 # of dofus with the same httpd
 # the bot will be launched after the connexion
 dofus = launchDofus()
+

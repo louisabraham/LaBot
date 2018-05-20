@@ -3,7 +3,6 @@ import re
 import pickle
 
 from pprint import pprint
-from typing import Union
 
 class_pattern =\
     r"\s*public class (?P<name>\w+) (?:extends (?P<parent>\w+) )?implements (?P<interface>\w+)\n"

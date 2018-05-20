@@ -7,7 +7,7 @@ from ..logs import logger
 
 def main(capture_file=None):
     ui.init(launch_in_thread, capture_file)
-    ui.start()
+    ui.async_start()
 
 
 if __name__ == "__main__":
