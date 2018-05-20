@@ -38,7 +38,9 @@ class Msg:
                 logger.debug("Message is NetworkDataContainerMessage! Uncompressing...")
                 newbuffer = Buffer(data.readByteArray())
                 newbuffer.uncompress()
-                return Msg.fromRaw(newbuffer, from_client)
+                msg = Msg.fromRaw(newbuffer, from_client)
+                assert msg is not None and not newbuffer.remaining()
+                return msg
             logger.debug("Parsed message with ID {}".format(id))
             buf.end()
 
