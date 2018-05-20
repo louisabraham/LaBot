@@ -4,7 +4,7 @@ import sys
 import os.path
 import os
 import subprocess
-
+from ..logs import logger
 
 confpath = os.path.join(os.path.dirname(__file__), 'proxychains.conf')
 command = ['proxychains4', '-f', confpath,
@@ -20,4 +20,5 @@ def launchDofus(stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess
 
 
 if __name__ == '__main__':
+    logger.setLevel('INFO')
     dofus = launchDofus(stdout=sys.stdout, stderr=sys.stderr)
