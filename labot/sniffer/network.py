@@ -126,8 +126,13 @@ def launch_in_thread(action):
 
 
 def on_msg(msg):
-    print(msg)
+    global m
+    m = msg
+    from pprint import pprint
+    pprint(msg.json()['__type__'])
+    print(msg.data)
+    print(Msg.from_json(msg.json()).data)
 
 
 if __name__ == '__main__':
-    launch_in_thread(on_msg)
+    stop = launch_in_thread(on_msg)
