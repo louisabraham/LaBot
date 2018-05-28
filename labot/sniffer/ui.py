@@ -52,7 +52,7 @@ class SnifferUI(Div):
 
 class MsgTable(Table):
     def __init__(self, *args, **kwargs):
-        super().__init__(class_='table-hover', *args, **kwargs)
+        super().__init__(class_='table-responsive', *args, **kwargs)
         self.thead = Thead(parent=self)
         self.tr1 = Tr(parent=self.thead)
         self.tr1.append(
