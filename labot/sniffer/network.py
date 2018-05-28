@@ -10,6 +10,7 @@ ctypes.macholib.dyld.DEFAULT_LIBRARY_FALLBACK.insert(0, '/opt/local/lib')
 import socket
 import threading
 from select import select
+from ..logs import logger
 
 try:
     from scapy3k.all import plist, conf
@@ -17,14 +18,14 @@ try:
     from scapy3k.data import ETH_P_ALL, MTU
 except ModuleNotFoundError:
     from scapy.all import plist, conf
-    from scapy.all import Raw, IP
+    from scapy.all import Raw, IP, PcapReader
     from scapy.data import ETH_P_ALL, MTU
 
 from ..data import Buffer, Msg
 
 
 def sniff(store=False, prn=None, lfilter=None,
-          stop_event=None, refresh=.1, *args, **kwargs):
+          stop_event=None, refresh=.1, offline=None, *args, **kwargs):
     """Sniff packets
 sniff([count=0,] [prn=None,] [store=1,] [offline=None,] [lfilter=None,] + L2ListenSocket args)
   Modified version of scapy.all.sniff
@@ -39,10 +40,16 @@ lfilter: python function applied to each packet to determine
 stop_event: Event that stops the function when set
 refresh: check stop_event.set() every refresh seconds
     """
-    s = conf.L2listen(type=ETH_P_ALL, *args, **kwargs)
+    logger.debug("Setting up sniffer...")
+    if offline is None:
+        L2socket = conf.L2listen
+        s = L2socket(type=ETH_P_ALL, *args, **kwargs)
+    else:
+        s = PcapReader(offline)
     remain = None
     lst = []
     try:
+        logger.debug("Started Sniffing")        
         while True:
             if stop_event and stop_event.is_set():
                 break
@@ -62,6 +69,7 @@ refresh: check stop_event.set() every refresh seconds
     except KeyboardInterrupt:
         pass
     finally:
+        logger.debug("Stopped sniffing.")
         s.close()
 
     return plist.PacketList(lst, "Sniffed")
@@ -74,12 +82,15 @@ def raw(pa):
 
 
 def from_client(pa):
+    logger.debug("Determining packet provenience...")
     dst = pa.getlayer(IP).dst
     src = pa.getlayer(IP).src
     local = socket.gethostbyname(socket.gethostname())
     if src == local:
+        logger.debug("Packet comes from local machine")
         return True
     elif dst == local:
+        logger.debug("Packet comes from server")
         return False
     assert False
 
@@ -93,6 +104,7 @@ def on_receive(pa, action):
     Parse the messages from that buffer
     Calls action on that buffer
     """
+    logger.debug("Received packet. ")
     direction = from_client(pa)
     buf = buf1 if direction else buf2
     buf += raw(pa)
@@ -102,18 +114,28 @@ def on_receive(pa, action):
         msg = Msg.fromRaw(buf, direction)
 
 
-def launch_in_thread(action):
+def launch_in_thread(action, capture_file=None):
     """Sniff in a new thread
     When a packet is received, Returns a stop function
     """
 
+    logger.debug("Launching sniffer in thread...")
+
     def _sniff(stop_event):
-        sniff(filter='tcp port 5555',
-              lfilter=lambda p: p.haslayer(Raw),
-              stop_event=stop_event,
-              prn=lambda p: on_receive(p, action)
-              )
-        print('sniffing stopped')
+        if capture_file:
+            sniff(filter='tcp port 5555',
+                  lfilter=lambda p: p.haslayer(Raw),
+                  stop_event=stop_event,
+                  prn=lambda p: on_receive(p, action),
+                  offline=capture_file
+                  )
+        else:
+            sniff(filter='tcp port 5555',
+                  lfilter=lambda p: p.haslayer(Raw),
+                  stop_event=stop_event,
+                  prn=lambda p: on_receive(p, action),
+                  )
+        logger.info('sniffing stopped')
 
     e = threading.Event()
     t = threading.Thread(target=_sniff, args=(e,))
@@ -121,6 +143,8 @@ def launch_in_thread(action):
 
     def stop():
         e.set()
+
+    logger.debug("Started sniffer in new thread")
 
     return stop
 

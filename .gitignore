@@ -4,3 +4,5 @@ __pycache__
 sources/
 protocol.pk
 junk/
+.mypy_cache
+.vscode

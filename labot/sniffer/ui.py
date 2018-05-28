@@ -11,11 +11,14 @@ from wdom.server import start_server, start
 from wdom.themes import bootstrap3
 
 from wdom.themes.bootstrap3 import *
-
+from ..logs import logger
 
 class SnifferUI(Div):
-    def __init__(self, startfun, *args, **kwargs):
+    def __init__(self, startfun, capture_file=None, *args, **kwargs):
+        logger.debug("Initializing sniffer UI with capture file {} and start function {}".format(capture_file,startfun))
+        
         self.startfun = startfun
+        self.capture_file = capture_file
         self.stopfun = None
         super().__init__(*args, **kwargs)
 
@@ -36,12 +39,14 @@ class SnifferUI(Div):
     def start(self, event):
         # TODO: display message
         if self.stopfun is None:
-            self.stopfun = self.startfun(self.msgtable.appendMsg)
+            self.stopfun = self.startfun(
+                self.msgtable.appendMsg, self.capture_file)
             self.info.textContent = 'Sniffer started'
         else:
             self.info.textContent = 'Sniffer already started'
 
     def stop(self, event):
+        logger.debug("Stop button clicked...")
         if self.stopfun is not None:
             self.stopfun()
             self.stopfun = None
@@ -52,7 +57,9 @@ class SnifferUI(Div):
 
 class MsgTable(Table):
     def __init__(self, *args, **kwargs):
-        super().__init__(class_='table-responsive', *args, **kwargs)
+        logger.debug("Initializing Message Table")
+        
+        super().__init__(class_='table-hover', *args, **kwargs)
         self.thead = Thead(parent=self)
         self.tr1 = Tr(parent=self.thead)
         self.tr1.append(
@@ -65,11 +72,13 @@ class MsgTable(Table):
         self.tbody = Tbody(parent=self)
 
     def appendMsg(self, msg):
+        logger.debug("Adding message to table")
         Msg(msg, parent=self.tbody)
 
 
 class Msg(Tr):
     def __init__(self, msg, *args, **kwargs):
+        logger.debug("Initializing UI Msg: {}".format(msg.msgType['name']))
         self.msg = msg
         if msg.count is not None:
             super().__init__(class_='success', *args, **kwargs)
@@ -87,6 +96,7 @@ class Msg(Tr):
         )
 
     def switch_view(self, event):
+        logger.debug("Changing view for message.")
         if not self.contents.textContent:
             self.contents.textContent = pformat(self.msg.json())
         else:
@@ -98,21 +108,30 @@ document.register_theme(bootstrap3)
 document.add_jsfile('https://unpkg.com/sticky-table-headers')
 
 
-def init(start):
+def init(start, capture_file=None):
+    logger.debug("Initializing UI...")
     global ui
-    ui = SnifferUI(start)
+    ui = SnifferUI(start, capture_file=capture_file)
     set_app(ui)
+    logger.debug("Finished initializing UI.")
+    
+
 
 
 def loop_in_thread(loop):
+    logger.debug("Starting loop: `{}` in thread".format(loop))
     asyncio.set_event_loop(loop)
     start()
+    logger.debug("Started loop in thread")
+    
 
 
 def async_start():
+    logger.debug("Starting sniffer asynchronously...")
     loop = asyncio.get_event_loop()
     t = threading.Thread(target=loop_in_thread, args=(loop,))
     t.start()
+    logger.debug("Started sniffer in thread: {}".format(t))
 
 
 if __name__ == '__main__':

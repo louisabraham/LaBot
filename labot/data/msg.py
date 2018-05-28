@@ -1,6 +1,6 @@
 from .binrw import Data
 from .. import protocol
-
+from ..logs import logger
 
 class Msg:
 
@@ -8,6 +8,7 @@ class Msg:
         self.id = m_id
         self.data = data
         self.count = count
+        logger.debug("Initialized Msg with id {}".format(self.id))
 
     def __str__(self):
         return 'Msg(id=%s, data=%s, count=%s)' % (self.id, self.data, self.count)
@@ -17,6 +18,7 @@ class Msg:
         """Read a message from the buffer and
         empty the beginning of the buffer.
         """
+        logger.debug("Trying to parse message from raw buffer...")
         try:
             header = buf.readUnsignedShort()
             if from_client:
@@ -25,12 +27,15 @@ class Msg:
                 count = None
             lenData = int.from_bytes(buf.read(header & 3), 'big')
             id = header >> 2
+            logger.debug("Message has id {}".format(id))
             data = Data(buf.read(lenData))
         except IndexError:
             buf.pos = 0
+            logger.debug("Could not parse message: Not complete")
             return None
         else:
             buf.end()
+            logger.debug("Parsed message with ID {}".format(id))
             return Msg(id, data, count)
 
     def lenlenData(self):
@@ -57,6 +62,7 @@ class Msg:
         return protocol.msg_from_id[self.id]
 
     def json(self):
+        logger.debug("Getting json representation of Message...")
         if not hasattr(self, 'parsed'):
             self.parsed = protocol.read(self.msgType, self.data)
         return self.parsed
