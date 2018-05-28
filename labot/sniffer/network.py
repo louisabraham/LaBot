@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 
+
+import os, sys
 # Necessary on macOS if the folder of libdnet is not in
 # ctypes.macholib.dyld.DEFAULT_LIBRARY_FALLBACK
 # because the newer macOS do not allow to export
 # $DYLD_FALLBACK_LIBRARY_PATH with sudo
-import ctypes.macholib.dyld
-ctypes.macholib.dyld.DEFAULT_LIBRARY_FALLBACK.insert(0, '/opt/local/lib')
+if os.name == "posix" and sys.platform == "darwin":
+    import ctypes.macholib.dyld
+    ctypes.macholib.dyld.DEFAULT_LIBRARY_FALLBACK.insert(0, '/opt/local/lib')
 
 import socket
 import threading
