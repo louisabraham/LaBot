@@ -46,7 +46,7 @@ L'option `-c` ou `--capture` avec comme argument l'adresse d'un fichier permet d
 
 `   sudo python -m labot.sniffer.main -c ./captures/macapture.pcap`
 
-L'option `-c` ou `--debug` permet d'afficher (beaucoup) plus d'informations sur ce qui est entrain de se passer.
+L'option `-d` ou `--debug` permet d'afficher (beaucoup) plus d'informations sur ce qui est entrain de se passer.
 
 
 mitm (en développement)
