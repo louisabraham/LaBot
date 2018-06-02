@@ -15,14 +15,9 @@ import threading
 from select import select
 from ..logs import logger
 
-try:
-    from scapy3k.all import plist, conf
-    from scapy3k.all import Raw, IP
-    from scapy3k.data import ETH_P_ALL, MTU
-except ImportError:
-    from scapy.all import plist, conf
-    from scapy.all import Raw, IP, PcapReader
-    from scapy.data import ETH_P_ALL, MTU
+from scapy.all import plist, conf
+from scapy.all import Raw, IP, PcapReader
+from scapy.data import ETH_P_ALL, MTU
 
 from ..data import Buffer, Msg
 
