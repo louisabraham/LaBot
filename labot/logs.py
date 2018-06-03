@@ -1,6 +1,6 @@
 import logging
 
-# Colored logs mainly a courtesy of 
+# Colored logs mainly a courtesy of
 # https://stackoverflow.com/questions/384076/how-can-i-color-python-logging-output
 BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE = range(8)
 
@@ -48,8 +48,8 @@ COLOR_FORMAT = formatter_message(FORMAT, True)
 
 
 color_formatter = ColoredFormatter(FORMAT)
-logger=logging.getLogger()
-handler=logging.StreamHandler()
+logger = logging.getLogger()
+handler = logging.StreamHandler()
 handler.setFormatter(color_formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.DEBUG)
