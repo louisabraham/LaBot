@@ -137,6 +137,3 @@ def async_start():
 if __name__ == '__main__':
     init(None)
     async_start()
-    from collections import namedtuple
-    MMsg = namedtuple('Msg', 'id count data')
-    ui.msgtable.appendMsg(MMsg('abcd', 'zjenzajn', 'jdnjnejnr'))
