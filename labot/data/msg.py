@@ -1,5 +1,5 @@
-from .binrw import Data
-from .. import protocol
+from .binrw import Data, Buffer
+from  .. import protocol
 from ..logs import logger
 
 class Msg:
@@ -34,9 +34,17 @@ class Msg:
             logger.debug("Could not parse message: Not complete")
             return None
         else:
-            buf.end()
+            if id == 2:
+                logger.debug("Message is NetworkDataContainerMessage! Uncompressing...")
+                newbuffer = Buffer(data.readByteArray())
+                newbuffer.uncompress()
+                msg = Msg.fromRaw(newbuffer, from_client)
+                assert msg is not None and not newbuffer.remaining()
+                return msg
             logger.debug("Parsed message with ID {}".format(id))
-            return Msg(id, data, count)
+            buf.end()
+
+            return Msg(id, data, count) 
 
     def lenlenData(self):
         if len(self.data) > 65535:
