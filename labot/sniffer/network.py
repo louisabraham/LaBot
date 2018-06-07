@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
 
-import os, sys
+import os
+import sys
 # Necessary on macOS if the folder of libdnet is not in
 # ctypes.macholib.dyld.DEFAULT_LIBRARY_FALLBACK
 # because the newer macOS do not allow to export
@@ -13,12 +14,14 @@ if os.name == "posix" and sys.platform == "darwin":
 import socket
 import threading
 from select import select
-from ..logs import logger
+import errno
 
 from scapy.all import plist, conf
 from scapy.all import Raw, IP, PcapReader
 from scapy.data import ETH_P_ALL, MTU
+from scapy.consts import WINDOWS
 
+from ..logs import logger
 from ..data import Buffer, Msg
 
 
@@ -26,17 +29,26 @@ def sniff(store=False, prn=None, lfilter=None,
           stop_event=None, refresh=.1, offline=None, *args, **kwargs):
     """Sniff packets
 sniff([count=0,] [prn=None,] [store=1,] [offline=None,] [lfilter=None,] + L2ListenSocket args)
-  Modified version of scapy.all.sniff
+Modified version of scapy.all.sniff
 
-  store: wether to store sniffed packets or discard them
-    prn: function to apply to each packet. If something is returned,
-         it is displayed. Ex:
-         ex: prn = lambda x: x.summary()
-lfilter: python function applied to each packet to determine
-         if further action may be done
-         ex: lfilter = lambda x: x.haslayer(Padding)
-stop_event: Event that stops the function when set
-refresh: check stop_event.set() every refresh seconds
+store : bool
+    wether to store sniffed packets or discard them
+
+prn : None or callable
+    function to apply to each packet. If something is returned,
+    it is displayed.
+    ex: prn = lambda x: x.summary()
+
+lfilter : None or callable
+    function applied to each packet to determine
+    if further action may be done
+    ex: lfilter = lambda x: x.haslayer(Padding)
+
+stop_event : None or Event
+    Event that stops the function when set
+
+refresh : float
+    check stop_event.set() every `refresh` seconds
     """
     logger.debug("Setting up sniffer...")
     if offline is None:
@@ -44,16 +56,39 @@ refresh: check stop_event.set() every refresh seconds
         s = L2socket(type=ETH_P_ALL, *args, **kwargs)
     else:
         s = PcapReader(offline)
-    remain = None
+
+    # on Windows, it is not possible to select a L2socket
+    if WINDOWS:
+        from scapy.arch.pcapdnet import PcapTimeoutElapsed
+        read_allowed_exceptions = (PcapTimeoutElapsed,)
+
+        def _select(sockets):
+            return sockets
+    else:
+        read_allowed_exceptions = ()
+
+        def _select(sockets):
+            try:
+                return select(sockets, [], [], refresh)[0]
+            except select_error as exc:
+                # Catch 'Interrupted system call' errors
+                if exc[0] == errno.EINTR:
+                    return []
+                raise
     lst = []
     try:
-        logger.debug("Started Sniffing")        
+        logger.debug("Started Sniffing")
         while True:
             if stop_event and stop_event.is_set():
                 break
-            sel = select([s], [], [], refresh)
-            if s in sel[0]:
-                p = s.recv(MTU)
+            sel = _select([s])
+            if s in sel:
+                try:
+                    p = s.recv(MTU)
+                except read_allowed_exceptions:
+                    # could add a sleep(refresh) if the CPU usage
+                    # is too much on windows
+                    continue
                 if p is None:
                     break
                 if lfilter and not lfilter(p):
