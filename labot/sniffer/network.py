@@ -127,7 +127,7 @@ def from_client(pa):
         return False
     logger.error("Packet origin unknown\nsrc: %s\ndst: %s\nlocal: %s",
                  src, dst, local)
-    assert False
+    assert False, "Packet origin unknown"
 
 
 buf1 = Buffer()
