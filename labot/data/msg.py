@@ -1,6 +1,7 @@
 from .binrw import Data, Buffer
-from  .. import protocol
+from .. import protocol
 from ..logs import logger
+
 
 class Msg:
 
@@ -11,7 +12,19 @@ class Msg:
         logger.debug("Initialized Msg with id {}".format(self.id))
 
     def __str__(self):
-        return 'Msg(id=%s, data=%s, count=%s)' % (self.id, self.data, self.count)
+        ans = str.format("{}(id={}, data={}, count={})",
+                         self.__class__.__name__,
+                         self.id,
+                         self.data,
+                         self.count)
+        return ans
+    def __repr__(self):
+        ans = str.format("{}(id={}, data={!r}, count={})",
+                         self.__class__.__name__,
+                         self.id,
+                         self.data,
+                         self.count)
+        return ans
 
     @staticmethod
     def fromRaw(buf, from_client):
@@ -35,7 +48,8 @@ class Msg:
             return None
         else:
             if id == 2:
-                logger.debug("Message is NetworkDataContainerMessage! Uncompressing...")
+                logger.debug(
+                    "Message is NetworkDataContainerMessage! Uncompressing...")
                 newbuffer = Buffer(data.readByteArray())
                 newbuffer.uncompress()
                 msg = Msg.fromRaw(newbuffer, from_client)
@@ -44,7 +58,7 @@ class Msg:
             logger.debug("Parsed message with ID {}".format(id))
             buf.end()
 
-            return Msg(id, data, count) 
+            return Msg(id, data, count)
 
     def lenlenData(self):
         if len(self.data) > 65535:
@@ -70,9 +84,13 @@ class Msg:
         return protocol.msg_from_id[self.id]
 
     def json(self):
-        logger.debug("Getting json representation of Message...")
+        logger.debug(
+            "Getting json representation of message with id %s", self.id)
         if not hasattr(self, 'parsed'):
-            self.parsed = protocol.read(self.msgType, self.data)
+            try:
+                self.parsed = protocol.read(self.msgType, self.data)
+            except IndexError:
+                logger.error("Index error for message")
         return self.parsed
 
     @staticmethod
@@ -81,3 +99,4 @@ class Msg:
         id = protocol.types[type]['protocolId']
         data = protocol.write(type, json)
         return Msg(id, data, count)
+
