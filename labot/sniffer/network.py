@@ -114,19 +114,37 @@ def raw(pa):
     return bytes(pa.getlayer(Raw))
 
 
+def get_local_ip():
+    """from https://stackoverflow.com/a/28950776/5133167
+    """
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        # doesn't even have to be reachable
+        s.connect(('10.255.255.255', 1))
+        IP = s.getsockname()[0]
+    except:
+        IP = '127.0.0.1'
+    finally:
+        s.close()
+    return IP
+
+
+LOCAL_IP = get_local_ip()
+
+
 def from_client(pa):
     logger.debug("Determining packet origin...")
     dst = pa.getlayer(IP).dst
     src = pa.getlayer(IP).src
-    local = socket.gethostbyname(socket.gethostname())
-    if src == local:
+    if src == LOCAL_IP:
         logger.debug("Packet comes from local machine")
         return True
-    elif dst == local:
+    elif dst == LOCAL_IP:
         logger.debug("Packet comes from server")
         return False
-    logger.error("Packet origin unknown\nsrc: %s\ndst: %s\nlocal: %s",
-                 src, dst, local)
+    elif src.startswith('192.168')
+    logger.error("Packet origin unknown\nsrc: %s\ndst: %s\nLOCAL_IP: %s",
+                 src, dst, LOCAL_IP)
     assert False, "Packet origin unknown"
 
 
