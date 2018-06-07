@@ -115,7 +115,7 @@ def raw(pa):
 
 
 def from_client(pa):
-    logger.debug("Determining packet provenience...")
+    logger.debug("Determining packet origin...")
     dst = pa.getlayer(IP).dst
     src = pa.getlayer(IP).src
     local = socket.gethostbyname(socket.gethostname())
@@ -125,6 +125,8 @@ def from_client(pa):
     elif dst == local:
         logger.debug("Packet comes from server")
         return False
+    logger.error("Packet origin unknown\nsrc: %s\ndst: %s\nlocal: %s",
+                 src, dst, local)
     assert False
 
 
