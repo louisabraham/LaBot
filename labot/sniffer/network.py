@@ -142,7 +142,6 @@ def from_client(pa):
     elif dst == LOCAL_IP:
         logger.debug("Packet comes from server")
         return False
-    elif src.startswith('192.168')
     logger.error("Packet origin unknown\nsrc: %s\ndst: %s\nLOCAL_IP: %s",
                  src, dst, LOCAL_IP)
     assert False, "Packet origin unknown"
