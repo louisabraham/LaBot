@@ -111,7 +111,7 @@ refresh : float
 def raw(pa):
     """Raw data from a packet
     """
-    return bytes(pa.getlayer(Raw))
+    return pa.getlayer(Raw).load
 
 
 def get_local_ip():
