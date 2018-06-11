@@ -18,6 +18,7 @@ class Msg:
                          self.data,
                          self.count)
         return ans
+
     def __repr__(self):
         ans = str.format("{}(id={}, data={!r}, count={})",
                          self.__class__.__name__,
@@ -85,12 +86,13 @@ class Msg:
 
     def json(self):
         logger.debug(
-            "Getting json representation of message with id %s", self.id)
+            "Getting json representation of message %s",
+            self)
         if not hasattr(self, 'parsed'):
             try:
                 self.parsed = protocol.read(self.msgType, self.data)
             except IndexError:
-                logger.error("Index error for message")
+                logger.error("Index error for message %s", self)
         return self.parsed
 
     @staticmethod
@@ -99,4 +101,3 @@ class Msg:
         id = protocol.types[type]['protocolId']
         data = protocol.write(type, json)
         return Msg(id, data, count)
-

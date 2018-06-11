@@ -28,7 +28,14 @@ class Data:
         return self
 
     def __str__(self):
-        return '%s(%s)' % (self.__class__.__name__, self.data.hex())
+        return str.format("{}(bytearray.fromhex('{}'))",
+                          self.__class__.__name__,
+                          self.data.hex())
+
+    def __repr__(self):
+        return str.format("{}({!r})",
+                          self.__class__.__name__,
+                          self.data)
 
     def remaining(self):
         return len(self) - self.pos
