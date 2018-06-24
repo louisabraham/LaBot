@@ -168,7 +168,8 @@ def on_receive(pa, action):
 
 def launch_in_thread(action, capture_file=None):
     """Sniff in a new thread
-    When a packet is received, Returns a stop function
+    When a packet is received, calls action
+    Returns a stop function
     """
 
     logger.debug("Launching sniffer in thread...")
