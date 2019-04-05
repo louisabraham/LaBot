@@ -11,7 +11,7 @@ def make_i18n_pickle():
         if not os.path.exists('./sources/pickles'):
             os.makedirs('./sources/pickles')
 
-        f = open(path, 'r')
+        f = open(path, encoding="utf-8", mode='r')
         i18n = json.load(f)
         f.close()
         f = open('./sources/pickles/I18nPickle', 'wb+')
