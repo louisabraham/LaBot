@@ -57,17 +57,17 @@ mitm (en développement)
 -   Redirection de la connexion de manière transparente, voir simplement
     le fichier exécutable `labot/mitm/proxychains.py`
 -   Serveur proxy http (`labot/mitm/proxy.py`)
--   Différentes interfaces de callback (`labot/mitm/bridge`)
+-   Différentes interfaces de callback (`labot/mitm/bridge.py`)
 -   Démarrage d'un bot, avec possibilité de lancer les callbacks en
     asynchrone
--   Décodage sommaire des paquets (`core/data/msg.py`)
+-   Décodage sommaire des paquets (`labot/data/msg.py`)
 
 ### Plates-formes :
 
 Ce code est compatible avec tout système où la commande
 [proxychains4](https://github.com/rofl0r/proxychains-ng) est installée
 (OS X, Linux). Il faut simplement modifier la commande de lancement de
-Dofus dans le fichier `core/network/proxychains.py`.
+Dofus dans le fichier `labot/mitm/proxychains.py`.
 
 ### Mode d'emploi :
 
@@ -75,7 +75,7 @@ Remplacer la fonction main dans core/main.py par la fonction main de
 votre bot. Elle prend en entrée `coJeu` et `coServ` les deux sockets
 vers le client et le serveur. On peut aussi choisir quelle fonction est
 appelée (pour distinguer les serveurs de connexion et de jeu) dans la
-méthode `do_CONNECT` de `core/network/proxy.py`.
+méthode `do_CONNECT` de `labot/mitm/proxy.py`.
 
 Si on prend une fonction main de type Bridge(coJeu, coServ,
 BridgeHandler).run(), cela fera transiter indépendament les paquets
