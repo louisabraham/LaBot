@@ -71,7 +71,7 @@ Dofus dans le fichier `labot/mitm/proxychains.py`.
 
 ### Mode d'emploi :
 
-Remplacer la fonction main dans core/main.py par la fonction main de
+Remplacer la fonction main dans labot/runsniffer.py par la fonction main de
 votre bot. Elle prend en entrée `coJeu` et `coServ` les deux sockets
 vers le client et le serveur. On peut aussi choisir quelle fonction est
 appelée (pour distinguer les serveurs de connexion et de jeu) dans la
