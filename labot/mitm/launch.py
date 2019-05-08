@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 
+from ..logs import logger
 from .proxy import startProxyServer
+from .bridge import PrintingMsgBridgeHandler
 from .proxychains import launchDofus
 
-logger.setLevel('INFO')
+
+logger.setLevel("INFO")
 
 # to interrupt : httpd.shutdown()
-httpd = startProxyServer()
+httpd = startProxyServer(PrintingMsgBridgeHandler.proxy_callback)
 
 # you can launch several instances
 # of dofus with the same httpd
