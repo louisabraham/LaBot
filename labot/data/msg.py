@@ -4,7 +4,6 @@ from ..logs import logger
 
 
 class Msg:
-
     def __init__(self, m_id, data, count=None):
         self.id = m_id
         self.data = data
@@ -12,19 +11,23 @@ class Msg:
         logger.debug("Initialized Msg with id {}".format(self.id))
 
     def __str__(self):
-        ans = str.format("{}(id={}, data={}, count={})",
-                         self.__class__.__name__,
-                         self.id,
-                         self.data,
-                         self.count)
+        ans = str.format(
+            "{}(id={}, data={}, count={})",
+            self.__class__.__name__,
+            self.id,
+            self.data,
+            self.count,
+        )
         return ans
 
     def __repr__(self):
-        ans = str.format("{}(id={}, data={!r}, count={})",
-                         self.__class__.__name__,
-                         self.id,
-                         self.data,
-                         self.count)
+        ans = str.format(
+            "{}(id={}, data={!r}, count={})",
+            self.__class__.__name__,
+            self.id,
+            self.data,
+            self.count,
+        )
         return ans
 
     @staticmethod
@@ -39,7 +42,7 @@ class Msg:
                 count = buf.readUnsignedInt()
             else:
                 count = None
-            lenData = int.from_bytes(buf.read(header & 3), 'big')
+            lenData = int.from_bytes(buf.read(header & 3), "big")
             id = header >> 2
             logger.debug("Message has id {}".format(id))
             data = Data(buf.read(lenData))
@@ -49,8 +52,7 @@ class Msg:
             return None
         else:
             if id == 2:
-                logger.debug(
-                    "Message is NetworkDataContainerMessage! Uncompressing...")
+                logger.debug("Message is NetworkDataContainerMessage! Uncompressing...")
                 newbuffer = Buffer(data.readByteArray())
                 newbuffer.uncompress()
                 msg = Msg.fromRaw(newbuffer, from_client)
@@ -76,7 +78,7 @@ class Msg:
         ans.writeShort(header)
         if self.count is not None:
             ans.writeUnsignedInt(self.count)
-        ans += len(self.data).to_bytes(self.lenlenData(), 'big')
+        ans += len(self.data).to_bytes(self.lenlenData(), "big")
         ans += self.data
         return ans.data
 
@@ -85,10 +87,8 @@ class Msg:
         return protocol.msg_from_id[self.id]
 
     def json(self):
-        logger.debug(
-            "Getting json representation of message %s",
-            self)
-        if not hasattr(self, 'parsed'):
+        logger.debug("Getting json representation of message %s", self)
+        if not hasattr(self, "parsed"):
             try:
                 self.parsed = protocol.read(self.msgType, self.data)
             except IndexError:
@@ -97,7 +97,8 @@ class Msg:
 
     @staticmethod
     def from_json(json, count=None):
-        type = json['__type__']
-        id = protocol.types[type]['protocolId']
-        data = protocol.write(type, json)
-        return Msg(id, data, count)
+        type_name: str = json["__type__"]
+        type_id: int = protocol.types[type_name]["protocolId"]
+        data = protocol.write(type_name, json)
+        return Msg(type_id, data, count)
+
