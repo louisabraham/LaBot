@@ -13,6 +13,7 @@ from abc import ABC, abstractmethod
 
 from ..data import Buffer, Msg
 from .. import protocol
+import os
 
 
 def from_client(origin):
@@ -42,6 +43,7 @@ class BridgeHandler(ABC):
         self.coJeu = coJeu
         self.coSer = coSer
         self.other = {coJeu: coSer, coSer: coJeu}
+        self.conns = [coJeu, coSer]
 
     @abstractmethod
     def handle(self, data, origin):
@@ -57,8 +59,19 @@ class BridgeHandler(ABC):
         coJeu: socket to the game
         coSer: socket to the server
         """
-        conns = [coJeu, coSer]
         bridge_handler = cls(coJeu, coSer)
+        bridge_handler.loop()
+
+    def loop(self):
+        """Callback that can be called by the proxy
+
+        It creates an instance of the class and
+        calls `handle` on every packet
+
+        coJeu: socket to the game
+        coSer: socket to the server
+        """
+        conns = self.conns
         active = True
         try:
             while active:
@@ -70,7 +83,7 @@ class BridgeHandler(ABC):
                     if not data:
                         active = False
                         break
-                    bridge_handler.handle(data, origin=r)
+                    self.handle(data, origin=r)
         finally:
             for c in conns:
                 c.close()
@@ -113,9 +126,9 @@ class MsgBridgeHandler(DummyBridgeHandler, ABC):
 
         super().handle(data, origin)
         self.buf[origin] += data
-
+        from_client = origin == self.coJeu
         # print(direction(origin), self.buf[origin].data)
-        msg = Msg.fromRaw(self.buf[origin], from_client(origin))
+        msg = Msg.fromRaw(self.buf[origin], from_client)
         while msg is not None:
             msgType = protocol.msg_from_id[msg.id]
             parsedMsg = protocol.read(msgType, msg.data)
@@ -127,7 +140,7 @@ class MsgBridgeHandler(DummyBridgeHandler, ABC):
             )
 
             self.handle_message(parsedMsg, origin)
-            msg = Msg.fromRaw(self.buf[origin], from_client(origin))
+            msg = Msg.fromRaw(self.buf[origin], from_client)
 
     @abstractmethod
     def handle_message(self, msg, origin):
@@ -140,4 +153,63 @@ class PrintingMsgBridgeHandler(MsgBridgeHandler):
         print(msg)
         print()
         print()
+
+
+class InjectorBridgeHandler(BridgeHandler):
+    """Forwards all packets and allows to inject
+    packets
+    """
+
+    def __init__(self, coJeu, coSer):
+        super().__init__(coJeu, coSer)
+        self.buf = {coJeu: Buffer(), coSer: Buffer()}
+        self.injected_to_client = 0
+        self.injected_to_server = 0
+        self.counter = 0
+        self.db = []
+
+    def send_to_client(self, data):
+        if isinstance(data, Msg):
+            data = data.bytes()
+        self.injected_to_client += 1
+        self.coJeu.sendall(data)
+
+    def send_to_server(self, data):
+        if isinstance(data, Msg):
+            data.count = self.counter + 1
+            data = data.bytes()
+        self.injected_to_server += 1
+        self.coSer.sendall(data)
+
+    def send_message(self, s):
+        msg = Msg.from_json(
+            {"__type__": "ChatClientMultiMessage", "content": s, "channel": 0}
+        )
+        msg.data.data += os.urandom(48)
+        self.send_to_server(msg)
+
+    def handle(self, data, origin):
+        self.buf[origin] += data
+        from_client = origin == self.coJeu
+
+        msg = Msg.fromRaw(self.buf[origin], from_client)
+
+        while msg is not None:
+            print(
+                "new message",
+                msg.id,
+                protocol.msg_from_id[msg.id]["name"],
+                len(msg.data),
+                msg.count,
+            )
+            if from_client:
+                msg.count += self.injected_to_server - self.injected_to_client
+                self.counter = msg.count
+            else:
+                self.counter += 1
+            self.db.append(msg)
+
+            self.other[origin].sendall(msg.bytes())
+
+            msg = Msg.fromRaw(self.buf[origin], from_client)
 
