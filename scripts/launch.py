@@ -14,11 +14,11 @@ from labot.mitm.bridge import *
 from proxychains import launchDofus
 
 
-parser = argparse.ArgumentParser(description="Start the proxy")
-parser.add_argument("--verbose", default="INFO", help="Logging level")
-parser.add_argument(
-    "--debug-mitm", action="store_true", help="Prints connexion to the CONNECT proxy"
+parser = argparse.ArgumentParser(
+    description="Start the proxy",
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter,
 )
+parser.add_argument("--verbose", default="INFO", help="Logging level")
 parser.add_argument(
     "--launch",
     action="store_true",
@@ -26,6 +26,9 @@ parser.add_argument(
 )
 parser.add_argument(
     "--port", type=int, default=8000, help="Listening port of the proxy server"
+)
+parser.add_argument(
+    "--dump-to", type=Path, default=None, help="Capture file (pickle format)"
 )
 
 if __name__ == "__main__":
@@ -35,14 +38,16 @@ if __name__ == "__main__":
 
     bridges = []
 
+    dumper = Dumper(args.dump_to) if args.dump_to else None
+
     def my_callback(coJeu, coSer):
         global bridges
-        bridge = InjectorBridgeHandler(coJeu, coSer)
+        bridge = InjectorBridgeHandler(coJeu, coSer, dumper=dumper)
         bridges.append(bridge)
         bridge.loop()
 
     # to interrupt : httpd.shutdown()
-    httpd = startProxyServer(my_callback, debug=args.debug_mitm, port=args.port)
+    httpd = startProxyServer(my_callback, port=args.port)
 
     # you can launch several instances
     # of dofus with the same httpd

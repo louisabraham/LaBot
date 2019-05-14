@@ -12,9 +12,13 @@ import select
 from abc import ABC, abstractmethod
 from collections import deque
 import os
+import logging
 
 from ..data import Buffer, Msg, Dumper
 from .. import protocol
+
+logger = logging.getLogger("labot")
+# TODO: use the logger
 
 
 def from_client(origin):
@@ -161,15 +165,15 @@ class InjectorBridgeHandler(BridgeHandler):
     packets
     """
 
-    def __init__(self, coJeu, coSer, db_size=100, dump_to=None):
+    def __init__(self, coJeu, coSer, db_size=100, dumper=None):
         super().__init__(coJeu, coSer)
         self.buf = {coJeu: Buffer(), coSer: Buffer()}
         self.injected_to_client = 0
         self.injected_to_server = 0
         self.counter = 0
         self.db = deque([], maxlen=db_size)
-        if dump_to is not None:
-            self.dumper = Dumper(dump_to)
+        if dumper is not None:
+            self.dumper = dumper
 
     def send_to_client(self, data):
         if isinstance(data, Msg):
