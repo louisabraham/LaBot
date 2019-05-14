@@ -10,6 +10,10 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 import socket
 from threading import Thread, Lock
 
+import logging
+
+logger = logging.getLogger("labot")
+
 
 class ConnectionWrapper:
     """
@@ -41,14 +45,12 @@ class ThreadingHTTPServer(ThreadingMixIn, HTTPServer):
     pass
 
 
-def make_proxy_request_handler(callback, debug):
+def make_proxy_request_handler(callback):
     """
     Returns a class inheriting from BaseHTTPRequestHandler
     """
 
     class ProxyRequestHandler(BaseHTTPRequestHandler):
-        debug_ = debug
-
         def do_CONNECT(self):
             """This method is called when the client tries
             to open a socket through our HTTP tunnel
@@ -77,18 +79,18 @@ def make_proxy_request_handler(callback, debug):
             # the TCPServer at the end of do_CONNECT
             coClient.wait_until_release()
 
+            logger.info("connection closed")
+
             # VERY IMPORTANT to avoid an infinite loop
             self.close_connection = True
 
         def log_message(self, format, *args):
-            """To avoid silly debug messages"""
-            if self.debug_:
-                super().log_message(format, *args)
+            logger.info(format, *args)
 
     return ProxyRequestHandler
 
 
-def startProxyServer(callback, debug=False, port=8000):
+def startProxyServer(callback, port=8000):
     """Opens an http tunnel on port 8000
     When a CONNECT request is made, it opens the socket
     and calls `callback(coClient, coServer)`
@@ -97,7 +99,7 @@ def startProxyServer(callback, debug=False, port=8000):
     `httpd.server_close()`
     """
     httpd = ThreadingHTTPServer(
-        ("localhost", port), make_proxy_request_handler(callback, debug)
+        ("localhost", port), make_proxy_request_handler(callback)
     )
     Thread(target=httpd.serve_forever).start()
     return httpd
