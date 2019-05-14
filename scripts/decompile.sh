@@ -5,6 +5,7 @@ export selectclass='com.ankamagames.dofus.BuildInfos,com.ankamagames.dofus.netwo
 export config='parallelSpeedUp=0'
 
 cd "$( dirname "${BASH_SOURCE[0]}" )"
+cd ..
 
 /Applications/FFDec.app/Contents/Resources/ffdec.sh \
   -config "$config" \
