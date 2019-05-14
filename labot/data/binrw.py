@@ -7,7 +7,6 @@ Replicate com.ankamagames.jerakine.network.CustomDataWrapper
 
 
 class Data:
-
     def __init__(self, data=None):
         if data is None:
             data = bytearray()
@@ -28,14 +27,12 @@ class Data:
         return self
 
     def __str__(self):
-        return str.format("{}(bytearray.fromhex('{}'))",
-                          self.__class__.__name__,
-                          self.data.hex())
+        return str.format(
+            "{}(bytearray.fromhex('{}'))", self.__class__.__name__, self.data.hex()
+        )
 
     def __repr__(self):
-        return str.format("{}({!r})",
-                          self.__class__.__name__,
-                          self.data)
+        return str.format("{}({!r})", self.__class__.__name__, self.data)
 
     def remaining(self):
         return len(self) - self.pos
@@ -53,12 +50,12 @@ class Data:
 
     def reset(self):
         self.pos = 0
-        
+
     def read(self, l):
         self.verif(l)
         pos = self.pos
         self.pos += l
-        return self.data[pos:pos + l]
+        return self.data[pos : pos + l]
 
     def uncompress(self):
         self.data = bytearray(decompress(self.data))
@@ -70,15 +67,15 @@ class Data:
 
     def writeBoolean(self, b):
         if b:
-            self.data += b'\x01'
+            self.data += b"\x01"
         else:
-            self.data += b'\x00'
+            self.data += b"\x00"
 
     def readByte(self):
-        return int.from_bytes(self.read(1), 'big', signed=True)
+        return int.from_bytes(self.read(1), "big", signed=True)
 
     def writeByte(self, b):
-        self.data += b.to_bytes(1, 'big', signed=True)
+        self.data += b.to_bytes(1, "big", signed=True)
 
     def readByteArray(self):
         lon = self.readVarInt()
@@ -88,28 +85,28 @@ class Data:
         self.data += ba
 
     def readDouble(self):
-        return struct.unpack('!d', self.read(8))[0]
+        return struct.unpack("!d", self.read(8))[0]
 
     def writeDouble(self, d):
-        self.data += struct.pack('!d', d)
+        self.data += struct.pack("!d", d)
 
     def readFloat(self):
-        return struct.unpack('!f', self.read(4))[0]
+        return struct.unpack("!f", self.read(4))[0]
 
     def writeFloat(self, f):
-        self.data += struct.pack('!f', f)
+        self.data += struct.pack("!f", f)
 
     def readInt(self):
-        return int.from_bytes(self.read(4), 'big', signed=True)
+        return int.from_bytes(self.read(4), "big", signed=True)
 
     def writeInt(self, i):
-        self.data += i.to_bytes(4, 'big', signed=True)
+        self.data += i.to_bytes(4, "big", signed=True)
 
     def readShort(self):
-        return int.from_bytes(self.read(2), 'big', signed=True)
+        return int.from_bytes(self.read(2), "big", signed=True)
 
     def writeShort(self, s):
-        self.data += s.to_bytes(2, 'big', signed=True)
+        self.data += s.to_bytes(2, "big", signed=True)
 
     def readUTF(self):
         lon = self.readUnsignedShort()
@@ -121,22 +118,32 @@ class Data:
         self.data += dat
 
     def readUnsignedByte(self):
-        return int.from_bytes(self.read(1), 'big')
+        return int.from_bytes(self.read(1), "big")
 
     def writeUnsignedByte(self, b):
-        self.data += b.to_bytes(1, 'big')
+        self.data += b.to_bytes(1, "big")
 
     def readUnsignedInt(self):
-        return int.from_bytes(self.read(4), 'big')
+        return int.from_bytes(self.read(4), "big")
 
     def writeUnsignedInt(self, ui):
-        self.data += ui.to_bytes(4, 'big')
+        self.data += ui.to_bytes(4, "big")
 
     def readUnsignedShort(self):
-        return int.from_bytes(self.read(2), 'big')
+        return int.from_bytes(self.read(2), "big")
 
     def writeUnsignedShort(self, us):
-        self.data += us.to_bytes(2, 'big')
+        self.data += us.to_bytes(2, "big")
+
+    def _writeVar(self, i):
+        if not i:
+            self.writeUnsignedByte(0)
+        while i:
+            b = i & 0b01111111
+            i >>= 7
+            if i:
+                b |= 0b10000000
+            self.writeUnsignedByte(b)
 
     def readVarInt(self):
         ans = 0
@@ -149,12 +156,7 @@ class Data:
 
     def writeVarInt(self, i):
         assert i.bit_length() <= 32
-        while i:
-            b = i & 0b01111111
-            i >>= 7
-            if i:
-                b |= 0b10000000
-            self.writeUnsignedByte(b)
+        self._writeVar(i)
 
     def readVarUhInt(self):
         return self.readVarInt()
@@ -173,12 +175,7 @@ class Data:
 
     def writeVarLong(self, i):
         assert i.bit_length() <= 64
-        while i:
-            b = i & 0b01111111
-            i >>= 7
-            if i:
-                b |= 0b10000000
-            self.writeUnsignedByte(b)
+        self._writeVar(i)
 
     def readVarUhLong(self):
         return self.readVarLong()
@@ -197,12 +194,7 @@ class Data:
 
     def writeVarShort(self, i):
         assert i.bit_length() <= 16
-        while i:
-            b = i & 0b01111111
-            i >>= 7
-            if i:
-                b |= 0b10000000
-            self.writeUnsignedByte(b)
+        self._writeVar(i)
 
     def readVarUhShort(self):
         return self.readVarShort()
@@ -212,11 +204,10 @@ class Data:
 
 
 class Buffer(Data):
-
     def end(self):
         """Very efficient
         """
-        del self.data[:self.pos]
+        del self.data[: self.pos]
         self.pos = 0
 
     def reset(self):
