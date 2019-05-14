@@ -45,24 +45,34 @@ def readVec(var, data):
     return ans
 
 
-def read(type, data):
+def read(type, data: Data):
     if type is False:
         type = types_from_id[data.readUnsignedShort()]
     elif isinstance(type, str):
         if type in primitives:
             return primitives[type][0](data)
         type = types[type]
-    ans = dict(__type__=type["name"])
-    parent = type["parent"]
-    if parent is not None:
-        ans.update(read(parent, data))
+    logger.debug("reading data %s", data)
+    logger.debug("with type %s", type)
+
+    if type["parent"] is not None:
+        logger.debug("calling parent %s", type["parent"])
+        ans = read(type["parent"], data)
         ans["__type__"] = type["name"]
+    else:
+        ans = dict(__type__=type["name"])
+
+    logger.debug("reading boolean variables")
     ans.update(readBooleans(type["boolVars"], data))
+    logger.debug("remaining data: %s", data.data[data.pos :])
+
     for var in type["vars"]:
+        logger.debug("reading %s", var)
         if var["length"] is not None:
             ans[var["name"]] = readVec(var, data)
         else:
             ans[var["name"]] = read(var["type"], data)
+        logger.debug("remaining data: %s", data.data[data.pos :])
     return ans
 
 
