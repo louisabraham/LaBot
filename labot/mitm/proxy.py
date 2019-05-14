@@ -1,15 +1,14 @@
 """
 This file implements a MITM (https://en.wikipedia.org/wiki/Man-in-the-middle_attack)
 by simulating an HTTP CONNECT tunnel (https://en.wikipedia.org/wiki/HTTP_tunnel)
+
+inspired by https://github.com/inaz2/proxy2/blob/master/proxy2.py
 """
 
 from socketserver import ThreadingMixIn
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import socket
 from threading import Thread, Lock
-
-
-connection_servers = ["213.248.126.39", "213.248.126.40"]
 
 
 class ConnectionWrapper:
@@ -56,7 +55,7 @@ def make_proxy_request_handler(callback, debug):
             """
             # address of the requested socket
             address = self.path.split(":", 1)
-            address[1] = int(address[1]) or 443
+            address[1] = int(address[1])
             try:
                 coServ = socket.create_connection(address, timeout=self.timeout)
             except Exception as e:
