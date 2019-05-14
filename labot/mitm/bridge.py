@@ -13,7 +13,7 @@ from abc import ABC, abstractmethod
 from collections import deque
 import os
 
-from ..data import Buffer, Msg
+from ..data import Buffer, Msg, Dumper
 from .. import protocol
 
 
@@ -161,13 +161,15 @@ class InjectorBridgeHandler(BridgeHandler):
     packets
     """
 
-    def __init__(self, coJeu, coSer, db_size=100):
+    def __init__(self, coJeu, coSer, db_size=100, dump_to=None):
         super().__init__(coJeu, coSer)
         self.buf = {coJeu: Buffer(), coSer: Buffer()}
         self.injected_to_client = 0
         self.injected_to_server = 0
         self.counter = 0
         self.db = deque([], maxlen=db_size)
+        if dump_to is not None:
+            self.dumper = Dumper(dump_to)
 
     def send_to_client(self, data):
         if isinstance(data, Msg):
@@ -209,7 +211,8 @@ class InjectorBridgeHandler(BridgeHandler):
             else:
                 self.counter += 1
             self.db.append(msg)
-
+            if self.dumper is not None:
+                self.dumper.dump(msg)
             self.other[origin].sendall(msg.bytes())
 
             msg = Msg.fromRaw(self.buf[origin], from_client)
