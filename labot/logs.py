@@ -13,19 +13,18 @@ BOLD_SEQ = "\033[1m"
 
 def formatter_message(message, use_color=True):
     if use_color:
-        message = message.replace(
-            "$RESET", RESET_SEQ).replace("$BOLD", BOLD_SEQ)
+        message = message.replace("$RESET", RESET_SEQ).replace("$BOLD", BOLD_SEQ)
     else:
         message = message.replace("$RESET", "").replace("$BOLD", "")
     return message
 
 
 COLORS = {
-    'WARNING': YELLOW,
-    'INFO': WHITE,
-    'DEBUG': BLUE,
-    'CRITICAL': YELLOW,
-    'ERROR': RED
+    "WARNING": YELLOW,
+    "INFO": WHITE,
+    "DEBUG": BLUE,
+    "CRITICAL": YELLOW,
+    "ERROR": RED,
 }
 
 
@@ -37,18 +36,19 @@ class ColoredFormatter(logging.Formatter):
     def format(self, record):
         levelname = record.levelname
         if self.use_color and levelname in COLORS:
-            levelname_color = COLOR_SEQ % (
-                30 + COLORS[levelname]) + levelname + RESET_SEQ
+            levelname_color = (
+                COLOR_SEQ % (30 + COLORS[levelname]) + levelname + RESET_SEQ
+            )
             record.levelname = levelname_color
         return logging.Formatter.format(self, record)
 
 
-FORMAT = '%(asctime)s.%(msecs)02d %(levelname)s: %(threadName)s - %(module)s.%(funcName)s(): %(message)s \n'
+FORMAT = "%(asctime)s.%(msecs)02d %(levelname)s: %(threadName)s - %(module)s.%(funcName)s(): %(message)s \n"
 COLOR_FORMAT = formatter_message(FORMAT, True)
 
 
 color_formatter = ColoredFormatter(FORMAT)
-logger = logging.getLogger()
+logger = logging.getLogger("labot")
 handler = logging.StreamHandler()
 handler.setFormatter(color_formatter)
 logger.addHandler(handler)
