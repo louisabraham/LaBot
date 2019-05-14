@@ -51,6 +51,9 @@ class Data:
         if len(self) < self.pos + l:
             raise IndexError(self.pos, l, len(self))
 
+    def reset(self):
+        self.pos = 0
+        
     def read(self, l):
         self.verif(l)
         pos = self.pos
