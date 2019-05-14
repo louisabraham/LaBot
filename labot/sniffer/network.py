@@ -3,13 +3,15 @@
 
 import os
 import sys
+
 # Necessary on macOS if the folder of libdnet is not in
 # ctypes.macholib.dyld.DEFAULT_LIBRARY_FALLBACK
 # because the newer macOS do not allow to export
 # $DYLD_FALLBACK_LIBRARY_PATH with sudo
 if os.name == "posix" and sys.platform == "darwin":
     import ctypes.macholib.dyld
-    ctypes.macholib.dyld.DEFAULT_LIBRARY_FALLBACK.insert(0, '/opt/local/lib')
+
+    ctypes.macholib.dyld.DEFAULT_LIBRARY_FALLBACK.insert(0, "/opt/local/lib")
 
 import socket
 import threading
@@ -21,12 +23,23 @@ from scapy.all import Raw, IP, PcapReader
 from scapy.data import ETH_P_ALL, MTU
 from scapy.consts import WINDOWS
 
-from ..logs import logger
+import logging
+
 from ..data import Buffer, Msg
 
+logger = logging.getLogger("labot")
 
-def sniff(store=False, prn=None, lfilter=None,
-          stop_event=None, refresh=.1, offline=None, *args, **kwargs):
+
+def sniff(
+    store=False,
+    prn=None,
+    lfilter=None,
+    stop_event=None,
+    refresh=0.1,
+    offline=None,
+    *args,
+    **kwargs
+):
     """Sniff packets
 sniff([count=0,] [prn=None,] [store=1,] [offline=None,] [lfilter=None,] + L2ListenSocket args)
 Modified version of scapy.all.sniff
@@ -60,10 +73,12 @@ refresh : float
     # on Windows, it is not possible to select a L2socket
     if WINDOWS:
         from scapy.arch.pcapdnet import PcapTimeoutElapsed
+
         read_allowed_exceptions = (PcapTimeoutElapsed,)
 
         def _select(sockets):
             return sockets
+
     else:
         read_allowed_exceptions = ()
 
@@ -75,6 +90,7 @@ refresh : float
                 if exc[0] == errno.EINTR:
                     return []
                 raise
+
     lst = []
     try:
         logger.debug("Started Sniffing")
@@ -120,10 +136,10 @@ def get_local_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
         # doesn't even have to be reachable
-        s.connect(('10.255.255.255', 1))
+        s.connect(("10.255.255.255", 1))
         IP = s.getsockname()[0]
     except:
-        IP = '127.0.0.1'
+        IP = "127.0.0.1"
     finally:
         s.close()
     return IP
@@ -142,8 +158,9 @@ def from_client(pa):
     elif dst == LOCAL_IP:
         logger.debug("Packet comes from server")
         return False
-    logger.error("Packet origin unknown\nsrc: %s\ndst: %s\nLOCAL_IP: %s",
-                 src, dst, LOCAL_IP)
+    logger.error(
+        "Packet origin unknown\nsrc: %s\ndst: %s\nLOCAL_IP: %s", src, dst, LOCAL_IP
+    )
     assert False, "Packet origin unknown"
 
 
@@ -176,19 +193,21 @@ def launch_in_thread(action, capture_file=None):
 
     def _sniff(stop_event):
         if capture_file:
-            sniff(filter='tcp port 5555',
-                  lfilter=lambda p: p.haslayer(Raw),
-                  stop_event=stop_event,
-                  prn=lambda p: on_receive(p, action),
-                  offline=capture_file
-                  )
+            sniff(
+                filter="tcp port 5555",
+                lfilter=lambda p: p.haslayer(Raw),
+                stop_event=stop_event,
+                prn=lambda p: on_receive(p, action),
+                offline=capture_file,
+            )
         else:
-            sniff(filter='tcp port 5555',
-                  lfilter=lambda p: p.haslayer(Raw),
-                  stop_event=stop_event,
-                  prn=lambda p: on_receive(p, action),
-                  )
-        logger.info('sniffing stopped')
+            sniff(
+                filter="tcp port 5555",
+                lfilter=lambda p: p.haslayer(Raw),
+                stop_event=stop_event,
+                prn=lambda p: on_receive(p, action),
+            )
+        logger.info("sniffing stopped")
 
     e = threading.Event()
     t = threading.Thread(target=_sniff, args=(e,))
@@ -206,10 +225,11 @@ def on_msg(msg):
     global m
     m = msg
     from pprint import pprint
-    pprint(msg.json()['__type__'])
+
+    pprint(msg.json()["__type__"])
     print(msg.data)
     print(Msg.from_json(msg.json()).data)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     stop = launch_in_thread(on_msg)

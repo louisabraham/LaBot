@@ -1,6 +1,10 @@
+import logging
+
 from .binrw import Data, Buffer
 from .. import protocol
-from ..logs import logger
+
+
+logger = logging.getLogger("labot")
 
 
 class Msg:

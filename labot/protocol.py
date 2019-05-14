@@ -1,9 +1,12 @@
 from functools import reduce
+import logging
 
-from .logs import logger
 from .protocolBuilder import types, msg_from_id, types_from_id, primitives
 from .data import Data, Buffer
 from zlib import decompress
+
+
+logger = logging.getLogger("labot")
 
 primitives = {
     name: (getattr(Data, "read" + name), getattr(Data, "write" + name))
