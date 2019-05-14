@@ -43,7 +43,7 @@ class ColoredFormatter(logging.Formatter):
         return logging.Formatter.format(self, record)
 
 
-FORMAT = "%(asctime)s.%(msecs)02d %(levelname)s: %(threadName)s - %(module)s.%(funcName)s(): %(message)s \n"
+FORMAT = "%(asctime)s.%(msecs)02d %(levelname)s: %(threadName)s - [%(pathname)s:%(lineno)d] in %(funcName)s():\n%(message)s\n"
 COLOR_FORMAT = formatter_message(FORMAT, True)
 
 
@@ -52,4 +52,4 @@ logger = logging.getLogger("labot")
 handler = logging.StreamHandler()
 handler.setFormatter(color_formatter)
 logger.addHandler(handler)
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
