@@ -17,7 +17,7 @@ class Dumper:
             self.fd.write(b)
 
     def dump(self, obj, protocol=None, *, fix_imports=True):
-        return dump(obj, self, protocol, fix_imports)
+        return dump(obj, self, protocol, fix_imports=fix_imports)
 
     def __getattr__(self, attr):
         return getattr(self.fd, attr)
