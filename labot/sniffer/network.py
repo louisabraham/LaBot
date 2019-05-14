@@ -85,9 +85,9 @@ refresh : float
         def _select(sockets):
             try:
                 return select(sockets, [], [], refresh)[0]
-            except select_error as exc:
+            except OSError as exc:
                 # Catch 'Interrupted system call' errors
-                if exc[0] == errno.EINTR:
+                if exc.errno == errno.EINTR:
                     return []
                 raise
 
