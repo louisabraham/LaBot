@@ -4,6 +4,7 @@ from pathlib import Path
 import re
 import pickle
 from pprint import pprint
+import argparse
 
 from tqdm import tqdm
 
@@ -144,19 +145,24 @@ def build():
         parse(t)
 
 
-filepath = Path(__file__).absolute().parent
+root_path = Path(__file__).absolute().parents[1]
+labot_path = root_path / "labot"
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="Protocol builder that creates protocol.pk from the decompiled sources"
+    )
+    parser.add_argument("--sources-path", type=Path, default=root_path / "sources")
+    parser.add_argument("--labot-path", type=Path, default=root_path / "labot")
+    args = parser.parse_args()
 
     types = {}
     msg_from_id = {}
     types_from_id = {}
 
     paths = [
-        filepath.parent.joinpath("sources/scripts/com/ankamagames/dofus/network/types"),
-        filepath.parent.joinpath(
-            "sources/scripts/com/ankamagames/dofus/network/messages"
-        ),
+        args.sources_path / "scripts/com/ankamagames/dofus/network/types",
+        args.sources_path / "scripts/com/ankamagames/dofus/network/messages",
     ]
 
     for p in paths:
@@ -171,15 +177,8 @@ if __name__ == "__main__":
         if v["type"] and not v["type"] in types
     }
 
-    with filepath.joinpath("protocol.pk").open("wb") as f:
+    with (args.labot_path / "protocol.pk").open("wb") as f:
         pickle.dump(types, f)
         pickle.dump(msg_from_id, f)
         pickle.dump(types_from_id, f)
         pickle.dump(primitives, f)
-
-else:
-    with filepath.joinpath("protocol.pk").open("rb") as f:
-        types = pickle.load(f)
-        msg_from_id = pickle.load(f)
-        types_from_id = pickle.load(f)
-        primitives = pickle.load(f)

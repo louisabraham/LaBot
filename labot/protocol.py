@@ -1,7 +1,14 @@
 from functools import reduce
+from pathlib import Path
+import pickle
 import logging
 
-from .protocolBuilder import types, msg_from_id, types_from_id, primitives
+with (Path(__file__).parent / "protocol.pk").open("rb") as f:
+    types = pickle.load(f)
+    msg_from_id = pickle.load(f)
+    types_from_id = pickle.load(f)
+    primitives = pickle.load(f)
+
 from .data import Data, Buffer
 from zlib import decompress
 
