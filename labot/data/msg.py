@@ -10,26 +10,28 @@ logger = logging.getLogger("labot")
 class Msg:
     def __init__(self, m_id, data, count=None):
         self.id = m_id
+        if isinstance(data, bytearray):
+            data = Data(data)
         self.data = data
         self.count = count
         logger.debug("Initialized Msg with id {}".format(self.id))
 
     def __str__(self):
         ans = str.format(
-            "{}(id={}, data={}, count={})",
+            "{}(m_id={}, data={}, count={})",
             self.__class__.__name__,
             self.id,
-            self.data,
+            self.data.data,
             self.count,
         )
         return ans
 
     def __repr__(self):
         ans = str.format(
-            "{}(id={}, data={!r}, count={})",
+            "{}(m_id={}, data={!r}, count={})",
             self.__class__.__name__,
             self.id,
-            self.data,
+            self.data.data,
             self.count,
         )
         return ans
@@ -93,10 +95,7 @@ class Msg:
     def json(self):
         logger.debug("Getting json representation of message %s", self)
         if not hasattr(self, "parsed"):
-            try:
-                self.parsed = protocol.read(self.msgType, self.data)
-            except IndexError:
-                logger.error("Index error for message %s", self)
+            self.parsed = protocol.read(self.msgType, self.data)
         return self.parsed
 
     @staticmethod
