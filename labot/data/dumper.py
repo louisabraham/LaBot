@@ -9,7 +9,7 @@ class Dumper:
     """
 
     def __init__(self, file: str):
-        self.fd = open(file, mode="wb")
+        self.fd = open(file, mode="ab")
         self.lock = Lock()
 
     def write(self, b):
