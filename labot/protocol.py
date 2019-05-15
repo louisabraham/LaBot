@@ -2,6 +2,7 @@ from functools import reduce
 from pathlib import Path
 import pickle
 import logging
+import random
 
 with (Path(__file__).parent / "protocol.pk").open("rb") as f:
     types = pickle.load(f)
@@ -103,8 +104,7 @@ def writeVec(var, el, data):
         write(var["type"], it, data)
 
 
-def write(type, json, data=None) -> Data:
-    # TODO: handle optional, hash function
+def write(type, json, data=None, random_hash=True) -> Data:
     if data is None:
         data = Data()
     if type is False:
@@ -120,8 +120,15 @@ def write(type, json, data=None) -> Data:
         write(parent, json, data)
     writeBooleans(type["boolVars"], json, data)
     for var in type["vars"]:
+        if var["optional"] and var["name"] not in json:
+            continue
         if var["length"] is not None:
             writeVec(var, json[var["name"]], data)
         else:
             write(var["type"], json[var["name"]], data)
+    if "hash_function" in json:
+        data.write(json["hash_function"])
+    elif type["hash_function"] and random_hash:
+        hash = bytes(random.getrandbits(8) for _ in range(48))
+        data.write(hash)
     return data

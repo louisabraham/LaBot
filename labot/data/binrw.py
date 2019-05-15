@@ -57,6 +57,9 @@ class Data:
         self.pos += l
         return self.data[pos : pos + l]
 
+    def write(self, l):
+        self.data += l
+
     def uncompress(self):
         self.data = bytearray(decompress(self.data))
 
