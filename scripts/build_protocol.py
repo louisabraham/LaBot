@@ -159,6 +159,7 @@ def parse(t):
     t["vars"] = vars
     t["boolVars"] = boolVars
     t["hash_function"] = hash_function
+    del t["path"]
 
 
 def build():
