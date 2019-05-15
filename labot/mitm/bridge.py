@@ -138,8 +138,7 @@ class MsgBridgeHandler(DummyBridgeHandler, ABC):
             msgType = protocol.msg_from_id[msg.id]
             parsedMsg = protocol.read(msgType, msg.data)
 
-            # TODO: 48 only for messages from client
-            assert msg.data.remaining() in [0, 48], (
+            assert msg.data.remaining() == 0, (
                 "All content of %s have not been read into %s:\n %s"
                 % (msgType, parsedMsg, msg.data)
             )
