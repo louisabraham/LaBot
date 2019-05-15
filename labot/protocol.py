@@ -120,8 +120,12 @@ def write(type, json, data=None, random_hash=True) -> Data:
         write(parent, json, data)
     writeBooleans(type["boolVars"], json, data)
     for var in type["vars"]:
-        if var["optional"] and var["name"] not in json:
-            continue
+        if var["optional"]:
+            if var["name"] in json:
+                data.writeByte(1)
+            else:
+                data.writeByte(0)
+                continue
         if var["length"] is not None:
             writeVec(var, json[var["name"]], data)
         else:
