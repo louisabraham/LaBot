@@ -43,9 +43,11 @@ if __name__ == "__main__":
                 db.append(msg)
                 msg.json()
                 logger.info("Successfully read %s", msg.msgType["name"])
+                assert msg.data.remaining() == 0
             except EOFError:
                 break
+            except Exception:
+                logger.setLevel("DEBUG")
+                msg.data.reset()
+                msg.json()
 
-logger.setLevel("DEBUG")
-msg.data.reset()
-msg.json()
