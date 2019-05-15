@@ -28,6 +28,7 @@ dynamic_type_pattern_of_type = (
 )
 optional_var_pattern_of_name = r"\s*if\(this\.%s == null\)\n"
 hash_function_pattern = r"\s*HASH_FUNCTION\(data\);\n"
+wrapped_boolean_pattern = r"\s*this.(?P<name>\w+) = BooleanByteWrapper\.getFlag\(.*;\n"
 
 
 def load_from_path(path):
@@ -111,6 +112,7 @@ def parseVectorVar(name, typename, lines):
 def parse(t):
     vars = []
     hash_function = False
+    wrapped_booleans = set()
 
     for line in lines(t):
 
@@ -135,6 +137,10 @@ def parse(t):
         if m:
             hash_function = True
 
+        m = re.fullmatch(wrapped_boolean_pattern, line)
+        if m:
+            wrapped_booleans.add(m.group("name"))
+
     t["protocolId"] = protocolId
 
     if "messages" in str(t["path"]):
@@ -145,8 +151,8 @@ def parse(t):
         types_from_id[protocolId] = t
 
     if sum(var["type"] == "Boolean" for var in vars) > 1:
-        boolVars = [var for var in vars if var["type"] == "Boolean"]
-        vars = [var for var in vars if var["type"] != "Boolean"]
+        boolVars = [var for var in vars if var["name"] in wrapped_booleans]
+        vars = [var for var in vars if var["name"] not in wrapped_booleans]
     else:
         boolVars = []
 
