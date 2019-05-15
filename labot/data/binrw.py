@@ -85,6 +85,7 @@ class Data:
         return self.read(lon)
 
     def writeByteArray(self, ba):
+        self.writeVarInt(len(ba))
         self.data += ba
 
     def readDouble(self):
