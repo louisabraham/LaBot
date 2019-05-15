@@ -171,8 +171,7 @@ class InjectorBridgeHandler(BridgeHandler):
         self.injected_to_server = 0
         self.counter = 0
         self.db = deque([], maxlen=db_size)
-        if dumper is not None:
-            self.dumper = dumper
+        self.dumper = dumper
 
     def send_to_client(self, data):
         if isinstance(data, Msg):
