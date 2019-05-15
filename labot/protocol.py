@@ -76,6 +76,8 @@ def read(type, data: Data):
         else:
             ans[var["name"]] = read(var["type"], data)
         logger.debug("remaining data: %s", data.data[data.pos :])
+    if type["hash_function"] and data.remaining() == 48:
+        ans["hash_function"] = data.read(48)
     return ans
 
 
@@ -102,7 +104,7 @@ def writeVec(var, el, data):
 
 
 def write(type, json, data=None) -> Data:
-    # TODO: handle optional
+    # TODO: handle optional, hash function
     if data is None:
         data = Data()
     if type is False:

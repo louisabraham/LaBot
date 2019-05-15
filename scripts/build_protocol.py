@@ -27,6 +27,7 @@ dynamic_type_pattern_of_type = (
     r"\s*(?:this\.)?\w+ = ProtocolTypeManager\.getInstance\(%s,\w*\);\n"
 )
 optional_var_pattern_of_name = r"\s*if\(this\.%s == null\)\n"
+hash_function_pattern = r"\s*HASH_FUNCTION\(data\);\n"
 
 
 def load_from_path(path):
@@ -109,6 +110,7 @@ def parseVectorVar(name, typename, lines):
 
 def parse(t):
     vars = []
+    hash_function = False
 
     for line in lines(t):
 
@@ -129,6 +131,10 @@ def parse(t):
             var = parseVar(m.group("name"), m.group("type"), lines(t))
             vars.append(var)
 
+        m = re.fullmatch(hash_function_pattern, line)
+        if m:
+            hash_function = True
+
     t["protocolId"] = protocolId
 
     if "messages" in str(t["path"]):
@@ -146,6 +152,7 @@ def parse(t):
 
     t["vars"] = vars
     t["boolVars"] = boolVars
+    t["hash_function"] = hash_function
 
 
 def build():
