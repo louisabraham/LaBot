@@ -51,3 +51,6 @@ if __name__ == "__main__":
                 msg.data.reset()
                 msg.json()
 
+            # try to reconstruct the message
+            reconstructed_msg = Msg.from_json(msg.json(), random_hash=False)
+            assert reconstructed_msg.data.data == msg.data.data
