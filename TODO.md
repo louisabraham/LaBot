@@ -1,8 +1,18 @@
 MITM:
 
+  - clean protocol builder
+  - simplify protocol (don't put empty optional and length)
   - document protocol
   - read maps
   - implement pathfinding
+
+-----
+
+Web:
+
+  - generate a static version of `labot.protocol.read` run by
+    [pyodide](https://github.com/iodide-project/pyodide)
+  - color on hover
 
 -----
 
