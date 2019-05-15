@@ -192,7 +192,6 @@ class InjectorBridgeHandler(BridgeHandler):
         msg = Msg.from_json(
             {"__type__": "ChatClientMultiMessage", "content": s, "channel": 0}
         )
-        msg.data.data += os.urandom(48)
         self.send_to_server(msg)
 
     def handle(self, data, origin):
