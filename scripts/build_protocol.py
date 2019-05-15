@@ -26,6 +26,7 @@ vector_const_len_pattern_of_name_and_type = (
 dynamic_type_pattern_of_type = (
     r"\s*(?:this\.)?\w+ = ProtocolTypeManager\.getInstance\(%s,\w*\);\n"
 )
+optional_var_pattern_of_name = r"\s*if\(this\.%s == null\)\n"
 
 
 def load_from_path(path):
@@ -44,7 +45,7 @@ def lines(t):
 
 def parseVar(name, typename, lines):
     if typename in ["Boolean", "ByteArray"]:
-        return dict(name=name, length=None, type=typename)
+        return dict(name=name, length=None, type=typename, optional=False)
     if typename in types:
         type = typename
 
@@ -54,6 +55,9 @@ def parseVar(name, typename, lines):
 
     attr_assign_pattern = attr_assign_pattern_of_name % name
     dynamic_type_pattern = dynamic_type_pattern_of_type % typename
+    optional_var_pattern = optional_var_pattern_of_name % name
+
+    optional = False
 
     for line in lines:
         m = re.fullmatch(attr_assign_pattern, line)
@@ -64,7 +68,11 @@ def parseVar(name, typename, lines):
         if m:
             type = False
 
-    return dict(name=name, length=None, type=type)
+        m = re.fullmatch(optional_var_pattern, line)
+        if m:
+            optional = True
+
+    return dict(name=name, length=None, type=type, optional=optional)
 
 
 def parseVectorVar(name, typename, lines):
@@ -96,7 +104,7 @@ def parseVectorVar(name, typename, lines):
         if m:
             length = int(m.group("size"))
 
-    return dict(name=name, length=length, type=type)
+    return dict(name=name, length=length, type=type, optional=False)
 
 
 def parse(t):
@@ -154,6 +162,7 @@ if __name__ == "__main__":
     )
     parser.add_argument("--sources-path", type=Path, default=root_path / "sources")
     parser.add_argument("--labot-path", type=Path, default=root_path / "labot")
+    # TODO: add filter for name
     args = parser.parse_args()
 
     types = {}

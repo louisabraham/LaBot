@@ -68,6 +68,9 @@ def read(type, data: Data):
 
     for var in type["vars"]:
         logger.debug("reading %s", var)
+        if var["optional"]:
+            if not data.readByte():
+                continue
         if var["length"] is not None:
             ans[var["name"]] = readVec(var, data)
         else:
@@ -99,6 +102,7 @@ def writeVec(var, el, data):
 
 
 def write(type, json, data=None) -> Data:
+    # TODO: handle optional
     if data is None:
         data = Data()
     if type is False:
