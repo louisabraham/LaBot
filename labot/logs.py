@@ -1,53 +1,45 @@
 import logging
+import time
 
-# Colored logs mainly a courtesy of
-# https://stackoverflow.com/questions/384076/how-can-i-color-python-logging-output
-BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE = range(8)
+import colorama
+from colorama import Fore, Style
 
-# The background is set with 40 plus the number of the color, and the foreground with 30
-# These are the sequences need to get colored ouput
-RESET_SEQ = "\033[0m"
-COLOR_SEQ = "\033[1;%dm"
-BOLD_SEQ = "\033[1m"
-
-
-def formatter_message(message, use_color=True):
-    if use_color:
-        message = message.replace("$RESET", RESET_SEQ).replace("$BOLD", BOLD_SEQ)
-    else:
-        message = message.replace("$RESET", "").replace("$BOLD", "")
-    return message
-
-
-COLORS = {
-    "WARNING": YELLOW,
-    "INFO": WHITE,
-    "DEBUG": BLUE,
-    "CRITICAL": YELLOW,
-    "ERROR": RED,
-}
+colorama.init()
 
 
 class ColoredFormatter(logging.Formatter):
-    def __init__(self, msg, use_color=True):
-        logging.Formatter.__init__(self, msg, "%H:%M:%S")
-        self.use_color = use_color
+    COLORS = {
+        "WARNING": Fore.YELLOW,
+        "INFO": Fore.WHITE,
+        "DEBUG": Fore.BLUE,
+        "CRITICAL": Fore.YELLOW,
+        "ERROR": Fore.RED,
+    }
+
+    FORMAT = (
+        f"{Fore.GREEN}%(asctime)s %(levelname)s: "
+        f"{Fore.CYAN}%(threadName)s - [%(pathname)s:%(lineno)d] "
+        f"in %(funcName)s():\n{Fore.WHITE}%(message)s\n"
+        f"{Style.RESET_ALL}"
+    )
+
+    def __init__(self):
+        logging.Formatter.__init__(self, self.FORMAT, "%H:%M:%S")
 
     def format(self, record):
         levelname = record.levelname
-        if self.use_color and levelname in COLORS:
-            levelname_color = (
-                COLOR_SEQ % (30 + COLORS[levelname]) + levelname + RESET_SEQ
-            )
-            record.levelname = levelname_color
+        if levelname in self.COLORS:
+            record.levelname = self.COLORS[levelname] + levelname + Style.RESET_ALL
         return logging.Formatter.format(self, record)
 
+    def formatTime(self, record, datefmt):
+        ct = self.converter(record.created)
+        t = time.strftime(datefmt, ct)
+        s = self.default_msec_format % (t, record.msecs)
+        return s
 
-FORMAT = "%(asctime)s.%(msecs)02d %(levelname)s: %(threadName)s - [%(pathname)s:%(lineno)d] in %(funcName)s():\n%(message)s\n"
-COLOR_FORMAT = formatter_message(FORMAT, True)
 
-
-color_formatter = ColoredFormatter(FORMAT)
+color_formatter = ColoredFormatter()
 logger = logging.getLogger("labot")
 handler = logging.StreamHandler()
 handler.setFormatter(color_formatter)

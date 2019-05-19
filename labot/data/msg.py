@@ -14,7 +14,7 @@ class Msg:
             data = Data(data)
         self.data = data
         self.count = count
-        logger.debug("Initialized Msg with id {}".format(self.id))
+        # logger.debug("Initialized Msg with id {}".format(self.id))
 
     def __str__(self):
         ans = str.format(
@@ -37,11 +37,13 @@ class Msg:
         return ans
 
     @staticmethod
-    def fromRaw(buf, from_client):
+    def fromRaw(buf: Data, from_client):
         """Read a message from the buffer and
         empty the beginning of the buffer.
         """
         logger.debug("Trying to parse message from raw buffer...")
+        if not buf:
+            return
         try:
             header = buf.readUnsignedShort()
             if from_client:
@@ -50,7 +52,6 @@ class Msg:
                 count = None
             lenData = int.from_bytes(buf.read(header & 3), "big")
             id = header >> 2
-            logger.debug("Message has id {}".format(id))
             data = Data(buf.read(lenData))
         except IndexError:
             buf.pos = 0
@@ -64,7 +65,7 @@ class Msg:
                 msg = Msg.fromRaw(newbuffer, from_client)
                 assert msg is not None and not newbuffer.remaining()
                 return msg
-            logger.debug("Parsed message with ID {}".format(id))
+            logger.debug("Parsed message with ID %i", id)
             buf.end()
 
             return Msg(id, data, count)
