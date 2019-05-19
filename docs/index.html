@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset='utf-8'>
+  <script src="https://iodide-project.github.io/pyodide-demo/pyodide.js"></script>
+</head>
+
+<body>
+  type (empty for message): <input id="datatype" type="text">
+  <input type="radio" name="from_client" value="1" checked> Client->Server
+  <input type="radio" name="from_client" value="0"> Server->Client
+  <br>
+  <textarea id="content" rows=4 cols=80></textarea>
+  <br>
+  <input id="decode" type="button" value="decode">
+  <br>
+  <textarea id="out" rows=20 cols=80></textarea>
+
+</body>
+<script src="protocol.json"></script>
+<script>
+  datatype = document.getElementById('datatype');
+  content = document.getElementById('content');
+  radio_buttons = document.getElementsByName('from_client')
+  from_client = () => document.querySelector('input[name="from_client"]:checked').value == "1";
+  out = document.getElementById('out');
+
+  url_params = new URLSearchParams(window.location.search);
+  datatype.value = url_params.get('type')
+  content.value = url_params.get('hex')
+  if (url_params.get('from_client') !== null)
+    radio_buttons[0].checked = true;
+  else
+    radio_buttons[1].checked = true;
+
+  languagePluginLoader.then(() => {
+    // load the code
+    fetch("main.py")
+      .then(res => res.text())
+      .then((out) => pyodide.runPython(out))
+      .then(() => {
+        decode = document.getElementById('decode');
+        decode.onclick = () => {
+          var parsedUrl = new URL(window.location.href);
+          if (datatype.value)
+            parsedUrl.searchParams.set('type', datatype.value);
+          else
+            parsedUrl.searchParams.delete('type');
+          parsedUrl.searchParams.set('hex', content.value);
+          if (from_client())
+            parsedUrl.searchParams.set('from_client', true);
+          else
+            parsedUrl.searchParams.delete('from_client');
+
+          window.history.replaceState({}, document.title, parsedUrl.href);
+          pyodide.runPython("main()");
+        };
+        decode.click();
+      });
+  })
+</script>
+
+</html>
