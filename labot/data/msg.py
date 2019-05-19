@@ -41,7 +41,6 @@ class Msg:
         """Read a message from the buffer and
         empty the beginning of the buffer.
         """
-        logger.debug("Trying to parse message from raw buffer...")
         if not buf:
             return
         try:
@@ -65,7 +64,7 @@ class Msg:
                 msg = Msg.fromRaw(newbuffer, from_client)
                 assert msg is not None and not newbuffer.remaining()
                 return msg
-            logger.debug("Parsed message with ID %i", id)
+            logger.debug("Parsed %s", protocol.msg_from_id[id]["name"])
             buf.end()
 
             return Msg(id, data, count)

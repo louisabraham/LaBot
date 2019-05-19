@@ -199,13 +199,20 @@ class InjectorBridgeHandler(BridgeHandler):
         msg = Msg.fromRaw(self.buf[origin], from_client)
 
         while msg is not None:
-            print(
-                "new message",
-                msg.id,
-                protocol.msg_from_id[msg.id]["name"],
-                len(msg.data),
-                msg.count,
-            )
+            if from_client:
+                logger.info(
+                    ("-> [%(count)i] %(name)s (%(size)iB)"),
+                    dict(
+                        count=msg.count,
+                        name=protocol.msg_from_id[msg.id]["name"],
+                        size=len(msg.data),
+                    ),
+                )
+            else:
+                logger.info(
+                    ("<- %(name)s (%(size)i)"),
+                    dict(name=protocol.msg_from_id[msg.id]["name"], size=len(msg.data)),
+                )
             if from_client:
                 msg.count += self.injected_to_server - self.injected_to_client
                 self.counter = msg.count
