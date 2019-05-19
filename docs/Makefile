@@ -3,6 +3,7 @@ all: pyodide.js pyodide.asm.js pyodide.asm.data pyodide.asm.data.js pyodide.asm.
 pyodide.js:
 	wget https://iodide-project.github.io/pyodide-demo/pyodide.js
 	sed -i -e "s/https:\/\/iodide-project.github.io\/pyodide-demo/./g" pyodide.js
+	rm pyodide.js-e
 
 pyodide.asm.js:
 	wget https://iodide-project.github.io/pyodide-demo/pyodide.asm.js
