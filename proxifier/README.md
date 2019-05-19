@@ -2,7 +2,7 @@
 
 ## Installation
 
-    pip install frida frida-cli
+    pip install frida frida-tools
 
 ## Usage
 
