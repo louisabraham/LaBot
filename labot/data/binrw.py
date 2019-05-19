@@ -48,7 +48,7 @@ class Data:
         if len(self) < self.pos + l:
             raise IndexError(self.pos, l, len(self))
 
-    def reset(self):
+    def reset_pos(self):
         self.pos = 0
 
     def read(self, l):

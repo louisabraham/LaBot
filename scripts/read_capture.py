@@ -48,7 +48,7 @@ if __name__ == "__main__":
                 break
             except Exception:
                 logger.setLevel("DEBUG")
-                msg.data.reset()
+                msg.data.reset_pos()
                 msg.json()
 
             # try to reconstruct the message
