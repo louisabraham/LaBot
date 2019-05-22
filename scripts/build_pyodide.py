@@ -15,22 +15,28 @@ with (labot_path / "protocol.pk").open("rb") as f:
     types = pickle.load(f)
     msg_from_id = pickle.load(f)
     types_from_id = pickle.load(f)
-    primitives = list(pickle.load(f))
+    primitives = sorted(pickle.load(f))
 
 
 exports = ["types", "msg_from_id", "types_from_id", "primitives"]
-with (docs_path / "protocol.json").open("w") as f:
+with (docs_path / "protocol.js").open("w") as f:
     for name in exports:
         f.write(f"{name} = ")
         json.dump(eval(name), f)
         f.write("\n")
 
 
-def filter_relative_imports(path, out):
+def apply_transforms(path, out, transforms):
     with open(labot_path / path) as f:
         for l in f:
-            if not l.startswith("from ."):
+            for t in transforms:
+                l = t(l)
+            if l:
                 out.write(l)
+
+
+def eliminate_relative_imports(l):
+    return l if not l.startswith("from .") else ""
 
 
 PROTOCOL_IMPORTS = """from js import types, msg_from_id, types_from_id, primitives
@@ -58,8 +64,12 @@ def main():
 
 
 with open(out_path, "w") as out:
-    filter_relative_imports("data/binrw.py", out)
-    filter_relative_imports("data/msg.py", out)
+    apply_transforms("data/binrw.py", out, [eliminate_relative_imports])
+    apply_transforms(
+        "data/msg.py",
+        out,
+        [eliminate_relative_imports, lambda l: l.replace("protocol.", "")],
+    )
     out.write(PROTOCOL_IMPORTS)
-    filter_relative_imports("protocol.py", out)
+    apply_transforms("protocol.py", out, [eliminate_relative_imports])
     out.write(SOURCE)

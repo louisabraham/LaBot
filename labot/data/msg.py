@@ -1,7 +1,7 @@
 import logging
 
 from .binrw import Data, Buffer
-from ..protocol import msg_from_id, read, write, types
+from .. import protocol
 
 
 logger = logging.getLogger("labot")
@@ -64,7 +64,7 @@ class Msg:
                 msg = Msg.fromRaw(newbuffer, from_client)
                 assert msg is not None and not newbuffer.remaining()
                 return msg
-            logger.debug("Parsed %s", msg_from_id[id]["name"])
+            logger.debug("Parsed %s", protocol.msg_from_id[id]["name"])
             buf.end()
 
             return Msg(id, data, count)
@@ -90,18 +90,18 @@ class Msg:
 
     @property
     def msgType(self):
-        return msg_from_id[self.id]
+        return protocol.msg_from_id[self.id]
 
     def json(self):
         logger.debug("Getting json representation of message %s", self)
         if not hasattr(self, "parsed"):
-            self.parsed = read(self.msgType, self.data)
+            self.parsed = protocol.read(self.msgType, self.data)
         return self.parsed
 
     @staticmethod
     def from_json(json, count=None, random_hash=True):
         type_name: str = json["__type__"]
-        type_id: int = types[type_name]["protocolId"]
-        data = write(type_name, json, random_hash=random_hash)
+        type_id: int = protocol.types[type_name]["protocolId"]
+        data = protocol.write(type_name, json, random_hash=random_hash)
         return Msg(type_id, data, count)
 
