@@ -22,7 +22,7 @@ DOFUS_PATH = {
 confpath = Path(__file__).parent / "proxychains.conf"
 
 
-def launchDofus(stdin=PIPE, stdout=PIPE, stderr=PIPE):
+def launch_dofus(stdin=PIPE, stdout=PIPE, stderr=PIPE):
     """to interrupt : dofus.terminate()"""
     assert sys.platform in DOFUS_PATH, (
         "Your platform (%s) doesn't support proxychains yet" % sys.platform
@@ -37,4 +37,4 @@ def launchDofus(stdin=PIPE, stdout=PIPE, stderr=PIPE):
 
 
 if __name__ == "__main__":
-    dofus = launchDofus(stdout=sys.stdout, stderr=sys.stderr)
+    dofus = launch_dofus(stdout=sys.stdout, stderr=sys.stderr)
