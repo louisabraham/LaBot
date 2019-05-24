@@ -1,0 +1,3 @@
+wdom
+fritm
+colorama
