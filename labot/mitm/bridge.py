@@ -68,14 +68,6 @@ class BridgeHandler(ABC):
         bridge_handler.loop()
 
     def loop(self):
-        """Callback that can be called by the proxy
-
-        It creates an instance of the class and
-        calls `handle` on every packet
-
-        coJeu: socket to the game
-        coSer: socket to the server
-        """
         conns = self.conns
         active = True
         try:
