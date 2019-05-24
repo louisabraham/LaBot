@@ -10,8 +10,6 @@ MITM:
 
 Web:
 
-  - generate a static version of `labot.protocol.read` run by
-    [pyodide](https://github.com/iodide-project/pyodide)
   - color on hover
 
 -----
