@@ -42,7 +42,7 @@ class Data:
 
     @classmethod
     def fromhex(cls, hex):
-        return cls(bytes.fromhex(hex))
+        return cls(bytearray.fromhex(hex))
 
     def verif(self, l):
         if len(self) < self.pos + l:
