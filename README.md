@@ -23,7 +23,7 @@ Parse les Msg.
 
 ## sniffer
 
-Nécessite wdom et scapy (`pip install wdom scapy`).
+Nécessite wdom et scapy (`pip install wdom scapy==2.4.2`).
 
 Lancer avec
 
