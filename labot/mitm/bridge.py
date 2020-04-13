@@ -13,6 +13,7 @@ from abc import ABC, abstractmethod
 from collections import deque
 import os
 import logging
+import time
 
 from ..data import Buffer, Msg, Dumper
 from .. import protocol
@@ -214,6 +215,7 @@ class InjectorBridgeHandler(BridgeHandler):
             if self.dumper is not None:
                 self.dumper.dump(msg)
             self.other[origin].sendall(msg.bytes())
+            time.sleep(0.005)   #add 5ms delay to avoid client bug during connection.
 
             msg = Msg.fromRaw(self.buf[origin], from_client)
 
