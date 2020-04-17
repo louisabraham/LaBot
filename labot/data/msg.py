@@ -64,7 +64,7 @@ class Msg:
                 msg = Msg.fromRaw(newbuffer, from_client)
                 assert msg is not None and not newbuffer.remaining()
                 return msg
-            logger.debug("Parsed %s", protocol.msg_from_id[id]["name"])
+#            logger.debug("Parsed %s", protocol.msg_from_id[id]["name"])
             buf.end()
 
             return Msg(id, data, count)
