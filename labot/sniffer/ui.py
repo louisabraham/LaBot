@@ -39,6 +39,9 @@ class SnifferUI(Div):
         stopbutton = DangerButton("stop", parent=self.button_wrapper)
         stopbutton.addEventListener("click", self.stop)
 
+        clearbutton = InfoButton("clear", parent=self.button_wrapper)
+        clearbutton.addEventListener("click", self.clear)
+
         self.info = P("Press start", parent=self.button_wrapper)
 
         self.msgtable = MsgTable(parent=self)
@@ -60,6 +63,8 @@ class SnifferUI(Div):
         else:
             self.info.textContent = "Sniffer already stopped"
 
+    def clear(self, event):
+        self.msgtable.clear(event)
 
 class MsgTable(Table):
     def __init__(self, *args, **kwargs):
@@ -80,6 +85,11 @@ class MsgTable(Table):
     def appendMsg(self, msg):
         logger.debug("Adding message to table")
         Msg(msg, parent=self.tbody)
+
+    def clear(self, msg):
+        self.tbody.remove()
+        self.tbody = Tbody(parent=self)
+
 
 
 class Msg(Tr):
