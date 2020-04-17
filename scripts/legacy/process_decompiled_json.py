@@ -1,3 +1,8 @@
+
+# logger = logging.getLogger()
+# path = Path(os.getcwd())
+# LabotPath = str(path.parent.parent)
+
 import logging
 import json
 import pickle
@@ -30,7 +35,7 @@ def make_i18n_pickle():
 
 
 def read_objects():
-    path = "./sources/data/Items.json"
+    path = "./sources/data/MonsterMiniBoss.json"
     logger.debug("Making pickle with item information from %s", path)
 
     try:
@@ -44,11 +49,11 @@ def read_objects():
         if not os.path.exists("./sources/pickles"):
             os.makedirs("./sources/pickles")
 
-        f = open("./sources/pickles/ItemsPickle", "wb+")
+        f = open("./sources/pickles/MonsterMiniBossPickle", "wb+")
         pickle.dump(item_dict, f)
         f.close()
         logger.debug(
-            "Made pickle with item information at %s", "./sources/pickles/ItemsPickle"
+            "Made pickle with item information at %s", "./sources/pickles/MonstersPickle"
         )
         return item_dict
     except FileNotFoundError:
@@ -58,5 +63,5 @@ def read_objects():
 
 
 if __name__ == "__main__":
-    make_i18n_pickle()
+    #make_i18n_pickle()
     read_objects()
