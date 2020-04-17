@@ -80,6 +80,7 @@ if __name__ == "__main__":
 
         def my_callback(coJeu, coSer):
             global bridges
+#            bridge = DummyBridgeHandler(coJeu, coSer)
             bridge = InjectorBridgeHandler(coJeu, coSer, dumper=dumper)
             bridges.append(bridge)
             bridge.loop()
@@ -92,7 +93,7 @@ if __name__ == "__main__":
         target = dofus.pid
 
     if args.attach:
-        target = args.pid or "dofus"
+        target = args.pid or "Dofus.exe"
 
     if args.launch or args.attach:
         hook(target, args.port)
