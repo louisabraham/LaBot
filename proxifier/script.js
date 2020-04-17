@@ -18,8 +18,8 @@ Interceptor.attach(connect_p, {
             this.addr += sockaddr_p.add(4 + i).readU8(4);
             if (i < 3) this.addr += '.';
         }
-
-        var newport = 8000;
+//      var newport = 8000;
+        var newport = 8080;
         sockaddr_p.add(2).writeByteArray([Math.floor(newport / 256), newport % 256]);
         sockaddr_p.add(4).writeByteArray([127, 0, 0, 1]);
 
