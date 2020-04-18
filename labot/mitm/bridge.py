@@ -188,12 +188,18 @@ class InjectorBridgeHandler(BridgeHandler):
     def handle(self, data, origin):
         self.buf[origin] += data
         from_client = origin == self.coJeu
-
         msg = Msg.fromRaw(self.buf[origin], from_client)
-
         while msg is not None:
+            msgType = protocol.msg_from_id[msg.id]
+            parsedMsg = protocol.read(msgType, msg.data)
+
+            assert msg.data.remaining() in [0, 48], (
+                    "All content of %s have not been read into %s:\n %s"
+                    % (msgType, parsedMsg, msg.data)
+            )
+
             if from_client:
-                logger.info(
+                logger.debug(
                     ("-> [%(count)i] %(name)s (%(size)i Bytes)"),
                     dict(
                         count=msg.count,
@@ -202,10 +208,11 @@ class InjectorBridgeHandler(BridgeHandler):
                     ),
                 )
             else:
-                logger.info(
+                logger.debug(
                     ("<- %(name)s (%(size)i Bytes)"),
                     dict(name=protocol.msg_from_id[msg.id]["name"], size=len(msg.data)),
                 )
+
             if from_client:
                 msg.count += self.injected_to_server - self.injected_to_client
                 self.counter = msg.count
@@ -215,7 +222,11 @@ class InjectorBridgeHandler(BridgeHandler):
             if self.dumper is not None:
                 self.dumper.dump(msg)
             self.other[origin].sendall(msg.bytes())
-            time.sleep(0.005)   #add a micro delay of 5ms between msg transfert. Avoid connection bug.
 
+            self.handle_message(parsedMsg, origin)
             msg = Msg.fromRaw(self.buf[origin], from_client)
 
+            time.sleep(0.005)
+
+    def handle_message(self, m, o):
+        pass
