@@ -19,6 +19,7 @@ Protocol:
 Web:
 
   - color on hover
+  - switch to <https://pywebview.flowrl.com/>
 
 -----
 
