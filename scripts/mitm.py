@@ -3,7 +3,6 @@
 import sys
 import os
 import argparse
-import sys
 from pathlib import Path
 from subprocess import Popen
 
@@ -95,7 +94,10 @@ if __name__ == "__main__":
         target = dofus.pid
 
     if args.attach:
-        target = args.pid or "dofus"
+        if sys.platform == "linux" or sys.platform == "win32":
+            target = args.pid or "Dofus.exe"
+        else:
+            target = args.pid or "dofus"
 
     if args.launch or args.attach:
         hook(target, args.port)
