@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
+import os
 import argparse
 import sys
 from pathlib import Path
@@ -15,11 +16,13 @@ from labot.mitm.bridge import *
 from fritm import hook, start_proxy_server
 import frida
 
+appdata = os.getenv("appdata")
+parent = os.path.dirname(appdata)
 
 DOFUS_PATH = {
     "darwin": "/Applications/Dofus.app/Contents/Data/Dofus.app/Contents/MacOS/Dofus",
     "linux": None,
-    "win32": None,
+    "win32": str(parent) + "\Local\Ankama\zaap\dofus\Dofus.exe",
     "cygwin": None,
 }
 
