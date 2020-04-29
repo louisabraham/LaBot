@@ -13,25 +13,22 @@ from labot.logs import logger
 from labot.mitm.bridge import *
 
 from fritm import hook, start_proxy_server
-import frida
-
-appdata = os.getenv("appdata")
-parent = os.path.dirname(appdata)
-
-DOFUS_PATH = {
-    "darwin": "/Applications/Dofus.app/Contents/Data/Dofus.app/Contents/MacOS/Dofus",
-    "linux": None,
-    "win32": str(parent) + "\Local\Ankama\zaap\dofus\Dofus.exe",
-    "cygwin": None,
-}
 
 
 def launch_dofus():
     """to interrupt : dofus.terminate()"""
-    assert sys.platform in DOFUS_PATH, (
-        "Your platform (%s) doesn't support proxychains yet" % sys.platform
-    )
-    return Popen(DOFUS_PATH[sys.platform])
+    platform = sys.platform
+    if platform == "darwin":
+        path = "/Applications/Dofus.app/Contents/Data/Dofus.app/Contents/MacOS/Dofus"
+    elif platform == "win32":
+        appdata = os.getenv("appdata")
+        parent = os.path.dirname(appdata)
+        path = parent + "\\Local\\Ankama\\zaap\\dofus\\Dofus.exe"
+    else:
+        assert False, (
+        "Your platform (%s) doesn't support automated launch yet" % sys.platform
+        )
+    return Popen(path)
 
 
 def make_parser():
