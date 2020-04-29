@@ -13,6 +13,7 @@ from abc import ABC, abstractmethod
 from collections import deque
 import os
 import logging
+import time
 
 from ..data import Buffer, Msg, Dumper
 from .. import protocol
@@ -191,9 +192,17 @@ class InjectorBridgeHandler(BridgeHandler):
         msg = Msg.fromRaw(self.buf[origin], from_client)
 
         while msg is not None:
+            msgType = protocol.msg_from_id[msg.id]
+            parsedMsg = protocol.read(msgType, msg.data)
+
+            assert msg.data.remaining() in [0, 48], (
+                    "All content of %s have not been read into %s:\n %s"
+                    % (msgType, parsedMsg, msg.data)
+            )
+
             if from_client:
-                logger.info(
-                    ("-> [%(count)i] %(name)s (%(size)iB)"),
+                logger.debug(
+                    ("-> [%(count)i] %(name)s (%(size)i Bytes)"),
                     dict(
                         count=msg.count,
                         name=protocol.msg_from_id[msg.id]["name"],
@@ -201,8 +210,8 @@ class InjectorBridgeHandler(BridgeHandler):
                     ),
                 )
             else:
-                logger.info(
-                    ("<- %(name)s (%(size)i)"),
+                logger.debug(
+                    ("<- %(name)s (%(size)i Bytes)"),
                     dict(name=protocol.msg_from_id[msg.id]["name"], size=len(msg.data)),
                 )
             if from_client:
@@ -215,5 +224,10 @@ class InjectorBridgeHandler(BridgeHandler):
                 self.dumper.dump(msg)
             self.other[origin].sendall(msg.bytes())
 
+            self.handle_message(parsedMsg, origin)
             msg = Msg.fromRaw(self.buf[origin], from_client)
 
+            time.sleep(0.005)
+
+    def handle_message(self, m, o):
+        pass

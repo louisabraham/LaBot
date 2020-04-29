@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 import sys
+import os
 import argparse
-import sys
 from pathlib import Path
 from subprocess import Popen
 
@@ -13,23 +13,22 @@ from labot.logs import logger
 from labot.mitm.bridge import *
 
 from fritm import hook, start_proxy_server
-import frida
-
-
-DOFUS_PATH = {
-    "darwin": "/Applications/Dofus.app/Contents/Data/Dofus.app/Contents/MacOS/Dofus",
-    "linux": None,
-    "win32": None,
-    "cygwin": None,
-}
 
 
 def launch_dofus():
     """to interrupt : dofus.terminate()"""
-    assert sys.platform in DOFUS_PATH, (
-        "Your platform (%s) doesn't support proxychains yet" % sys.platform
-    )
-    return Popen(DOFUS_PATH[sys.platform])
+    platform = sys.platform
+    if platform == "darwin":
+        path = "/Applications/Dofus.app/Contents/Data/Dofus.app/Contents/MacOS/Dofus"
+    elif platform == "win32":
+        appdata = os.getenv("appdata")
+        parent = os.path.dirname(appdata)
+        path = parent + "\\Local\\Ankama\\zaap\\dofus\\Dofus.exe"
+    else:
+        assert False, (
+        "Your platform (%s) doesn't support automated launch yet" % sys.platform
+        )
+    return Popen(path)
 
 
 def make_parser():
@@ -92,7 +91,14 @@ if __name__ == "__main__":
         target = dofus.pid
 
     if args.attach:
-        target = args.pid or "dofus"
+        target = args.pid
+        if target is None:
+            if sys.platform == "darwin":
+                target = "dofus"
+            elif sys.platform == "win32":
+                target = "Dofus.exe"
+            else:
+                assert False, "Your platform requires a pid to attach"
 
     if args.launch or args.attach:
         hook(target, args.port)
