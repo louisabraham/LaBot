@@ -91,10 +91,14 @@ if __name__ == "__main__":
         target = dofus.pid
 
     if args.attach:
-        if sys.platform == "linux" or sys.platform == "win32":
-            target = args.pid or "Dofus.exe"
-        else:
-            target = args.pid or "dofus"
+        target = args.pid
+        if target is None:
+            if sys.platform == "darwin":
+                target = "dofus"
+            elif sys.platform == "win32":
+                target = "Dofus.exe"
+            else:
+                assert False, "Your platform requires a pid to attach"
 
     if args.launch or args.attach:
         hook(target, args.port)
