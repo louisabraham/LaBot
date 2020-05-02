@@ -86,7 +86,7 @@ if __name__ == "__main__":
             bridge.loop()
 
         # to interrupt : httpd.shutdown()
-        httpd = start_proxy_server(my_callback, args.port, FILTER)
+        httpd = start_proxy_server(my_callback, args.port)
 
     if args.launch:
         dofus = launch_dofus()
