@@ -14,6 +14,8 @@ from labot.mitm.bridge import *
 
 from fritm import hook, start_proxy_server
 
+FILTER = "port == 5555 || port == 443"
+
 
 def launch_dofus():
     """to interrupt : dofus.terminate()"""
@@ -26,7 +28,7 @@ def launch_dofus():
         path = parent + "\\Local\\Ankama\\zaap\\dofus\\Dofus.exe"
     else:
         assert False, (
-        "Your platform (%s) doesn't support automated launch yet" % sys.platform
+            "Your platform (%s) doesn't support automated launch yet" % sys.platform
         )
     return Popen(path)
 
@@ -84,7 +86,7 @@ if __name__ == "__main__":
             bridge.loop()
 
         # to interrupt : httpd.shutdown()
-        httpd = start_proxy_server(my_callback, port=args.port)
+        httpd = start_proxy_server(my_callback, args.port, FILTER)
 
     if args.launch:
         dofus = launch_dofus()
@@ -101,7 +103,7 @@ if __name__ == "__main__":
                 assert False, "Your platform requires a pid to attach"
 
     if args.launch or args.attach:
-        hook(target, args.port)
+        hook(target, args.port, FILTER)
         pass
 
     if not sys.flags.interactive:
