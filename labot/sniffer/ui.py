@@ -65,6 +65,7 @@ class SnifferUI(Div):
     def clear(self, event):
         self.msgtable.clear(event)
 
+
 class MsgTable(Table):
     def __init__(self, *args, **kwargs):
         logger.debug("Initializing Message Table")
@@ -88,6 +89,7 @@ class MsgTable(Table):
     def clear(self, msg):
         self.tbody.remove()
         self.tbody = Tbody(parent=self)
+
 
 class Msg(Tr):
     def __init__(self, msg, *args, **kwargs):

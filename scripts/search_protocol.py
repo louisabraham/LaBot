@@ -32,4 +32,3 @@ if __name__ == "__main__":
     parser.add_argument("search_string")
     args = parser.parse_args()
     pprint(search(protocol.types, args.search_string.casefold()))
-

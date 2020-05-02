@@ -12,8 +12,6 @@ sys.path.append(Path(__file__).absolute().parents[1].as_posix())
 from labot.logs import logger
 from labot.mitm.bridge import *
 
-from fritm import hook, start_proxy_server
-
 
 def launch_dofus():
     """to interrupt : dofus.terminate()"""
@@ -26,7 +24,7 @@ def launch_dofus():
         path = parent + "\\Local\\Ankama\\zaap\\dofus\\Dofus.exe"
     else:
         assert False, (
-        "Your platform (%s) doesn't support automated launch yet" % sys.platform
+            "Your platform (%s) doesn't support automated launch yet" % sys.platform
         )
     return Popen(path)
 

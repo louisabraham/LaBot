@@ -196,8 +196,8 @@ class InjectorBridgeHandler(BridgeHandler):
             parsedMsg = protocol.read(msgType, msg.data)
 
             assert msg.data.remaining() in [0, 48], (
-                    "All content of %s have not been read into %s:\n %s"
-                    % (msgType, parsedMsg, msg.data)
+                "All content of %s have not been read into %s:\n %s"
+                % (msgType, parsedMsg, msg.data)
             )
 
             if from_client:
