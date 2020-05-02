@@ -104,4 +104,3 @@ class Msg:
         type_id: int = protocol.types[type_name]["protocolId"]
         data = protocol.write(type_name, json, random_hash=random_hash)
         return Msg(type_id, data, count)
-
