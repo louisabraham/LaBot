@@ -81,7 +81,7 @@ class Msg:
     def bytes(self):
         header = 4 * self.id + self.lenlenData()
         ans = Data()
-        ans.writeShort(header)
+        ans.writeUnsignedShort(header)
         if self.count is not None:
             ans.writeUnsignedInt(self.count)
         ans += len(self.data).to_bytes(self.lenlenData(), "big")
