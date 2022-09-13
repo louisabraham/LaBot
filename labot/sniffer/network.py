@@ -18,8 +18,8 @@ import threading
 from select import select
 import errno
 
-from scapy.all import plist, conf
-from scapy.all import Raw, IP, PcapReader
+from scapy import plist
+from scapy.all import Raw, IP, PcapReader, Scapy_Exception, conf
 from scapy.data import ETH_P_ALL, MTU
 from scapy.consts import WINDOWS
 
@@ -72,7 +72,8 @@ refresh : float
 
     # on Windows, it is not possible to select a L2socket
     if WINDOWS:
-        from scapy.arch.pcapdnet import PcapTimeoutElapsed
+        class PcapTimeoutElapsed(Scapy_Exception):
+            pass
 
         read_allowed_exceptions = (PcapTimeoutElapsed,)
 
@@ -96,6 +97,7 @@ refresh : float
         logger.debug("Started Sniffing")
         while True:
             if stop_event and stop_event.is_set():
+                print('breaked')
                 break
             sel = _select([s])
             if s in sel:
@@ -105,16 +107,15 @@ refresh : float
                     # could add a sleep(refresh) if the CPU usage
                     # is too much on windows
                     continue
-                if p is None:
-                    break
-                if lfilter and not lfilter(p):
-                    continue
-                if store:
-                    lst.append(p)
-                if prn:
-                    r = prn(p)
-                    if r is not None:
-                        print(r)
+                if p is not None:
+                    if lfilter and not lfilter(p):
+                        continue
+                    if store:
+                        lst.append(p)
+                    if prn:
+                        r = prn(p)
+                        if r is not None:
+                            print(r)
     except KeyboardInterrupt:
         pass
     finally:
