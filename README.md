@@ -69,3 +69,7 @@ Quelques classes sont fournies à titre d'exemple et il est possible d'en hérit
 `send_to_client` permnet d'envoyer un message au client et `send_to_server` d'envoyer un message au serveur.
 
 `send_message` montre un exemple de message qui peut être envoyé au serveur, en l'occurrence un message qui demande d'envoyer un message dans le chat.
+
+## Aide
+
+J'ai assez peu de temps pour répondre aux questions. Je recommande le serveur Discord de Cadernis pour des demandes d'aide: https://discord.gg/UYSFa6TCm3
