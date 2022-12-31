@@ -1,89 +1,71 @@
 # LaBot : Bot Dofus 2 en Python 3
 
-## data
+## Introduction
 
-  - Buffer
-  - Fonctions pour reader / writer
+Un bot nécessite de réaliser plusieurs tâches :
+1. initier, détourner ou intercepter la communication entre le client et le serveur
+2. interpréter les paquets interceptés
+3. gérer une logique de comportement
+4. générer des paquets et les envoyer
 
-## decompile.sh
+L'étape 1 est la différence entre différents types de bots : 
+- un bot "complet" doit initier la connexion avec le serveur et le client
+- un bot "mitm" doit détourner la commmunication entre le client et le serveur et éventuellement y injecter des messages
+- un bot "sniffer" doit simplement intercepter la communication entre le client et le serveur
 
-Script pour décompiler certaines parties du client avec [JPEXS
-FFDec](https://github.com/jindrapetrik/jpexs-decompiler). Si vous n'êtes
-pas sous macOS, le chemin de Dofus doit être modifié.
 
-## protocolBuilder.py
+## MITM
 
-Après avoir décompilé, ce script parse les sources et mémorise le
-protocole dans `protocol.pk`. Il doit être lancé à chaque nouvelle
-version.
+LaBot est un bot "mitm" qui utilise le module [fritm](https://github.com/louisabraham/fritm) pour détourner la communication entre le client et le serveur. fritm utilise [frida](https://www.frida.re/) pour intercepter les appels à la fonction [`connect`](http://man7.org/linux/man-pages/man2/connect.2.html) du système d'exploitation et les rediriger vers un proxy HTTP CONNECT.
 
-## protocol.py
+Une fois que le MITM est lancé, le bot récupère deux sockets, un vers le client et un vers le serveur. Il peut alors lire et écrire sur ces sockets pour communiquer avec le client et le serveur.
 
-Parse les Msg.
+Des classes de callback basiques sont disponibles dans `labot/mitm/bridge` pour gérer la communication avec le client et le serveur.
 
-## sniffer
+Le point d'entrée est le script `scripts/mitm.py` qui lance le proxy fritm et un bridge.
 
-Nécessite wdom et scapy (`pip install wdom scapy`).
+Il existe également un sniffer dans `labot/sniffer` qui utilise [scapy](https://scapy.net/) pour intercepter les paquets mais il n'est plus maintenu.
 
-Lancer avec
+## Reader / Writer
 
-    `sudo python -m labot.sniffer.main`
+Les paquets réseau sont lus à l'aide de classes dans `labot/data`. Ces classes décrivent comment séparer les messages individuels dans un flux continu de données et comment lire les types primitifs de données à partir d'informations binaires.
 
-Pour accéder à l'interface graphique, ouvrir <http://localhost:8888>
-dans un navigateur.
+## Protocole
 
-`sudo` est nécessaire pour sniffer.
+Le procotole désigne la manière dont le jeu encode des données dans différents types de paquets.
 
-Le filtre par défaut est `tcp port 5555`
+Afin de pouvoir répliquer ce protocole entre différentes versions de Dofus, sa construction est automatisée.
 
-L'option `-c` ou `--capture` avec comme argument l'adresse d'un fichier
-permet de lire depuis une capture faite via wireshark ou tcpdump,
-pratique en phase de test pour ne pas devoir effectuer 100fois les memes
-actions dans le jeu. Exemple:
+### Décompilation
 
-`sudo python -m labot.sniffer.main -c ./captures/macapture.pcap`
+La première étape est de décompiler le jeu. Pour cela, le script `scripts/decompile.sh` est fourni. Il permet de décompiler certaines parties du client avec [JPEXS FFDec](https://github.com/jindrapetrik/jpexs-decompiler).
 
-L'option `-d` ou `--debug` permet d'afficher (beaucoup) plus
-d'informations sur ce qui est entrain de se passer.
+Le script actuel utilise les chemins par défaut sous macOS.
 
-## mitm (en développement)
+### Construction du protocole
 
-### Fonctionnalités
+Après décompilation, le procole est construit par le script `scripts/build_protocol.py`. Il parse les sources et mémorise le protocole dans `protocol.pk`. Les deux scripts doivent être lancés à chaque nouvelle version de Dofus.
 
-  - Redirection de la connexion de manière transparente, voir simplement
-    le fichier exécutable `labot/mitm/proxychains.py`
-  - Serveur proxy http (`labot/mitm/proxy.py`)
-  - Différentes interfaces de callback (`labot/mitm/bridge`)
-  - Démarrage d'un bot, avec possibilité de lancer les callbacks en
-    asynchrone
-  - Décodage sommaire des paquets (`labot/data/msg.py`)
+### Utilisation du protocole
 
-### Plates-formes :
+Le protocole est utilisé dans `labot/protocol.py` pour transformer les paquets binaires en dictionnaires (json). Les méthodes de `labot/protocol.py` sont appelées directement dans les méthodes `json()` et `from_json()` de la classe `Msg` de `labot/data/msg.py`.
 
-Ce code est compatible avec tout système où la commande
-[proxychains4](https://github.com/rofl0r/proxychains-ng) est installée
-(OS X, Linux). Il faut simplement modifier la commande de lancement de
-Dofus dans le fichier `labot/mitm/proxychains.py`.
 
-### Mode d'emploi :
+### Decodeur en ligne
 
-Lancer `labot.mitm.proxy.startProxyServer` avec en argument la fonction
-de votre choix qui prend en entrée `coJeu` et `coServ`, les deux sockets
-vers le client et le serveur. Cette fonction fonction est appelée dans
-la méthode `do_CONNECT` du proxy HTTP quand le client ouvre une
-connexion.
+Un décodeur en ligne est disponible dans le dossier `docs` et à l'adresse https://louisabraham.github.io/LaBot/decoder.html
 
-Les classes de `labot.mitm.bridge` implémentent des exemples de
-fonctions dans `proxy_callback`. Il y a plusieurs exemples,
-`PrintingMsgBridgeHandler.proxy_callback` permet par exemple de
-distinguer les paquets, d'afficher les ids ainsi que le contenu
-hexadécimal.
+Le script `scripts/build_pyodide.py` convertit `protocol.pk` en un fichier `protocol.js` et concatène plusieurs fichiers Python pour être exécutés dans le navigateur par [pyodide](https://pyodide.org/en/stable/).
 
-On peut lancer autant de clients qu'on veut sur le même serveur proxy
-car il utilise 1 thread différent pour chaque connexion.
 
-`labot/mitm/proxychains.py` permet de directement lancer le jeu avec les
-paramètres du proxy. Il est aussi possible de lancer le jeu à la "main"
-en ayant configuré leur proxy HTTP dans les options du jeu pour qu'il
-pointe vers le serveur de `labot.mitm.proxy` (par défaut
-`localhost:8000`).
+## Comportement
+
+Un bot doit modifier les classes de `labot/mitm/bridge` pour gérer le comportement.
+
+Quelques classes sont fournies à titre d'exemple et il est possible d'en hériter pour créer un nouveau comportement.
+
+`handle_message` est appelé quand un message est reçu du client ou du serveur. Il est possible de modifier le message avant de le renvoyer.
+
+`send_to_client` permnet d'envoyer un message au client et `send_to_server` d'envoyer un message au serveur.
+
+`send_message` montre un exemple de message qui peut être envoyé au serveur, en l'occurrence un message qui demande d'envoyer un message dans le chat.
