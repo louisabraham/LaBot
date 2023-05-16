@@ -58,6 +58,12 @@ Un décodeur en ligne est disponible dans le dossier `docs` et à l'adresse http
 Le script `scripts/build_pyodide.py` convertit `protocol.pk` en un fichier `protocol.js` et concatène plusieurs fichiers Python pour être exécutés dans le navigateur par [pyodide](https://pyodide.org/en/stable/).
 
 
+### API
+
+Il est possible de démarrer un serveur web `webapi/api.py` sur le port 5000 pour effectuer des call REST pour décoder/encoder les paquets.
+La connexion est aussi acceptée via websocket.
+
+
 ## Comportement
 
 Un bot doit modifier les classes de `labot/mitm/bridge` pour gérer le comportement.

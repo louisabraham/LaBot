@@ -99,7 +99,7 @@ class Msg:
         return self.parsed
 
     @staticmethod
-    def from_json(json, count=None, random_hash=True):
+    def from_json(json, count=None, random_hash=False):
         type_name: str = json["__type__"]
         type_id: int = protocol.types[type_name]["protocolId"]
         data = protocol.write(type_name, json, random_hash=random_hash)

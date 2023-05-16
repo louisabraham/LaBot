@@ -6,3 +6,4 @@ protocol.pk
 junk/
 .mypy_cache
 .vscode
+.idea
